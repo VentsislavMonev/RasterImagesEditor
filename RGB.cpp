@@ -19,35 +19,37 @@ unsigned RGB::getAverage() const
     return getSum() / 3;
 }
 
+
+// da napravq setovete s int i da prihvashtam ako mi se podava -
 void RGB::setRed(unsigned _red)
 {
-    if (_red > 255) throw std::invalid_argument("Cant have a red value greater than 255!");
+    if (_red > 255) throw std::invalid_argument("Can have value for red only in between 0-255!");
     else red = _red;
 }
 
 void RGB::setGreen(unsigned _green)
 {
-    if (_green > 255) throw std::invalid_argument("Cant have a green value greater than 255!");
+    if (_green > 255) throw std::invalid_argument("Can have value for green only in between 0-255!");
     else green = _green;
 }
 
 void RGB::setBlue(unsigned _blue)
 {
-    if (_blue > 255) throw std::invalid_argument("Cant have a blue value greater than 255!");
+    if (_blue > 255) throw std::invalid_argument("Can have value for blue only in between 0-255!");
     else blue = _blue;
 }
 
-unsigned RGB::r() const
+unsigned char RGB::r() const
 {
     return red;
 }
 
-unsigned RGB::g() const
+unsigned char RGB::g() const
 {
     return green;
 }
 
-unsigned RGB::b() const
+unsigned char RGB::b() const
 {
     return blue;
 }

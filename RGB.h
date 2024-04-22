@@ -14,15 +14,15 @@ public:
 	void setGreen(unsigned _green);
 	void setBlue(unsigned _blue);
 
-	unsigned r()const;
-	unsigned g()const;
-	unsigned b()const;
+	unsigned char r()const;
+	unsigned char g()const;
+	unsigned char b()const;
 
 	static unsigned getMaxValue();
 private:
-	unsigned red;
-	unsigned green;
-	unsigned blue;
+	unsigned char red;
+	unsigned char green;
+	unsigned char blue;
 
 	static const unsigned maxValue = 255;
 };
