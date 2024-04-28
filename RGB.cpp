@@ -2,7 +2,7 @@
 
 RGB::RGB() :red(0), green(0), blue(0) {}
 
-RGB::RGB(unsigned _red, unsigned _green, unsigned _blue)
+RGB::RGB(int _red, int _green, int _blue)
 {
     setRed(_red);
     setGreen(_green);
@@ -19,23 +19,24 @@ unsigned RGB::getAverage() const
     return getSum() / 3;
 }
 
-
-// da napravq setovete s int i da prihvashtam ako mi se podava -
-void RGB::setRed(unsigned _red)
+void RGB::setRed(int _red)
 {
-    if (_red > 255) throw std::invalid_argument("Can have value for red only in between 0-255!");
+    if (_red > 255)    throw std::invalid_argument("Value for red can only be less than 256!");
+    else if (_red < 0) throw std::invalid_argument("Value for red can only be more than 0!");
     else red = _red;
 }
 
-void RGB::setGreen(unsigned _green)
+void RGB::setGreen(int _green)
 {
-    if (_green > 255) throw std::invalid_argument("Can have value for green only in between 0-255!");
+    if (_green > 255)    throw std::invalid_argument("Value for green can only be less than 256!");
+    else if (_green < 0) throw std::invalid_argument("Value for green can only be more than 0!");
     else green = _green;
 }
 
-void RGB::setBlue(unsigned _blue)
+void RGB::setBlue(int _blue)
 {
-    if (_blue > 255) throw std::invalid_argument("Can have value for blue only in between 0-255!");
+    if (_blue > 255)    throw std::invalid_argument("Value for blue can only be less than 256!");
+    else if (_blue < 0) throw std::invalid_argument("Value for blue can only be more than 0!");
     else blue = _blue;
 }
 

@@ -5,14 +5,14 @@ class RGB
 {
 public:
 	RGB();
-	RGB(unsigned _red, unsigned _green, unsigned _blue);
+	RGB(int _red, int _green, int _blue);
 
 	unsigned getSum()const;
 	unsigned getAverage()const;
 
-	void setRed(unsigned _red);
-	void setGreen(unsigned _green);
-	void setBlue(unsigned _blue);
+	void setRed(int _red);
+	void setGreen(int _green);
+	void setBlue(int _blue);
 
 	unsigned char r()const;
 	unsigned char g()const;
