@@ -19,6 +19,28 @@ unsigned RGB::getAverage() const
     return getSum() / 3;
 }
 
+void RGB::setEqual(int value)
+{
+    setRed(value);
+    setEqualToRed();
+}
+
+void RGB::setEqualToRed()
+{
+    green = blue = red;
+}
+
+void RGB::setEqualToGreen()
+{
+    blue = red = green;
+}
+
+void RGB::setEqualToBlue()
+{
+    red = green = blue;
+}
+
+
 void RGB::setRed(int _red)
 {
     if (_red > 255)    throw std::invalid_argument("Value for red can only be less than 256!");

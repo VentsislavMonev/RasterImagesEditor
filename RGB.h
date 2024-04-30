@@ -9,6 +9,10 @@ public:
 
 	unsigned getSum()const;
 	unsigned getAverage()const;
+	void setEqual(int value);
+	void setEqualToRed();
+	void setEqualToGreen();
+	void setEqualToBlue();
 
 	void setRed(int _red);
 	void setGreen(int _green);
