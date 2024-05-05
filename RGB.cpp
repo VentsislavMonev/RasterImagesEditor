@@ -16,6 +16,7 @@ unsigned RGB::getSum()const
 
 unsigned RGB::getAverage() const
 {
+    //RGB have 3 colours
     return getSum() / 3;
 }
 
@@ -43,21 +44,21 @@ void RGB::setEqualToBlue()
 
 void RGB::setRed(int _red)
 {
-    if (_red > 255)    throw std::invalid_argument("Value for red can only be less than or equal to 255!");
+    if (_red > maxValue)    throw std::invalid_argument("Value for red can only be less than or equal to 255!");
     else if (_red < 0) throw std::invalid_argument("Value for red can only be more than or equal to 0!");
     else red = _red;
 }
 
 void RGB::setGreen(int _green)
 {
-    if (_green > 255)    throw std::invalid_argument("Value for green can only be less than or equal to 255!");
+    if (_green > maxValue)    throw std::invalid_argument("Value for green can only be less than or equal to 255!");
     else if (_green < 0) throw std::invalid_argument("Value for green can only be more than or equal to 0!");
     else green = _green;
 }
 
 void RGB::setBlue(int _blue)
 {
-    if (_blue > 255)    throw std::invalid_argument("Value for blue can only be less than or equal to 255!");
+    if (_blue > maxValue)    throw std::invalid_argument("Value for blue can only be less than or equal to 255!");
     else if (_blue < 0) throw std::invalid_argument("Value for blue can only be more than or equal to 0!");
     else blue = _blue;
 }
