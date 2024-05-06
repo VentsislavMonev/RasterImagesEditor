@@ -33,6 +33,7 @@ public:
 protected:
 	void transposeMatrix();
 	void reverseColumns();
+	void reverseRows();
 private:
 	std::vector<std::vector<RGB>> pixels;
 	unsigned char maxValue;

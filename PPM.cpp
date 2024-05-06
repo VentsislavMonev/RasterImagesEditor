@@ -87,6 +87,23 @@ bool PPM::rotateLeft()
 	reverseColumns();
 }
 
+bool PPM::rotateRight()
+{
+	transposeMatrix();
+
+	reverseColumns();
+}
+
+bool PPM::flipTop()
+{
+	reverseColumns();
+}
+
+bool PPM::flipLeft()
+{
+	reverseRows();
+}
+
 void PPM::transposeMatrix()
 {
 	for (size_t i = 0; i < getWidth(); ++i)
@@ -97,7 +114,14 @@ void PPM::transposeMatrix()
 void PPM::reverseColumns()
 {
 	unsigned short rowsCount = getLength();
-	for (size_t i = 0; i < getWidth(); ++i)
-		for (size_t j = 0; j < getLength() / 2; j++)
-			std::swap(pixels[i][j], pixels[i][rowsCount - 1 - j]);
+	for (size_t i = 0; i < rowsCount/2; ++i)
+			std::swap(pixels[i], pixels[rowsCount-1-i]);
+}
+
+void PPM::reverseRows()
+{
+	unsigned short columnsCount = getWidth();
+	for (size_t i = 0; i < getWidth(); i++)
+		for (size_t j = 0; j < getLength()/2; j++)
+			std::swap(pixels[i][j], pixels[i][columnsCount-1-i]);
 }
