@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <string>
 
 namespace ImageProcesing
 {
@@ -35,6 +37,7 @@ public:
 
 //getters
 public:
+	const std::string& getFileName()const;
 	ImageProcesing::ImageType getFormat()const;
 	unsigned short getWidth()const;
 	unsigned short getLength()const;
@@ -43,14 +46,14 @@ public:
 
 //methods
 public:
-	virtual bool grayScale()  = 0;
-	virtual bool monochrome() = 0;
-	virtual bool negative()   = 0;
+	virtual void grayScale()  = 0;
+	virtual void monochrome() = 0;
+	virtual void negative() = 0;
 
-	virtual bool rotateLeft() = 0;
-	virtual bool rotateRight()= 0;
-	virtual bool flipTop()	  = 0;
-	virtual bool flipLeft()   = 0;
+	virtual void rotateLeft() = 0;
+	virtual void rotateRight()= 0;
+	virtual void flipTop()	  = 0;
+	virtual void flipLeft()   = 0;
  
     //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY);
 
@@ -60,14 +63,13 @@ public:
 
 //setters
 protected:
+	virtual void setFileName(const std::string& _fileName);
 	void setWidth(int _width);
 	void setLength(int _length);
-
-private:
 	void setFormat(ImageProcesing::ImageType _format);
-
 //members
 private:
+	std::string fileName;
 	ImageProcesing::ImageType format;
 	unsigned short width;
 	unsigned short length;

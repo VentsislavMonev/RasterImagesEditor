@@ -52,6 +52,22 @@ void Image::undo()
 	commandsToDo.pop_back();
 }
 
+void Image::setFileName(const std::string& _fileName)
+{
+	size_t fileNameSize = _fileName.size();
+	for (size_t i = 0; i < fileNameSize; ++i)
+	{
+		if ((_fileName[i] < 'A' || _fileName[i] > 'Z') &&
+			(_fileName[i] < 'a' || _fileName[i]> 'z') && 
+			_fileName[i] != '.' && _fileName[i]!=' ')
+		{
+			throw std::invalid_argument("Inavalid file name!");
+		}
+	}
+	
+	fileName = _fileName;
+}
+
 void Image::setWidth(int _width)
 {
 	if (_width < 0)
@@ -70,6 +86,11 @@ void Image::setLength(int _length)
 		throw std::invalid_argument("Length is too big!");
 	else
 		length = _length;
+}
+
+const std::string& Image::getFileName() const
+{
+	return fileName;
 }
 
 ImageProcesing::ImageType Image::getFormat() const
