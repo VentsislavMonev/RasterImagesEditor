@@ -1,6 +1,10 @@
 #pragma once
 #include <iostream>
 
+static const float colorimetricValueRed = 0.2126;
+static const float colorimetricValueGreen = 0.7152;
+static const float colorimetricValueBlue = 0.0722;
+
 class RGB
 {
 public:
@@ -9,6 +13,8 @@ public:
 
 	unsigned getSum()const;
 	unsigned getAverage()const;
+	unsigned getGrayScaleValue()const;
+
 	void setEqual(int value);
 	void setEqualToRed();
 	void setEqualToGreen();

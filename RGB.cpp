@@ -20,6 +20,14 @@ unsigned RGB::getAverage() const
     return getSum() / 3;
 }
 
+unsigned RGB::getGrayScaleValue() const
+{
+    unsigned char result = 0;
+    result = r() * colorimetricValueRed +
+             g() * colorimetricValueGreen +
+             b() * colorimetricValueBlue;
+}
+
 void RGB::setEqual(int value)
 {
     setRed(value);
