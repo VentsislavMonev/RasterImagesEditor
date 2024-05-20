@@ -1,4 +1,5 @@
 #include "Image.h"
+#include "Utility.h"
 
 Image::Image()
 {
@@ -6,20 +7,34 @@ Image::Image()
 	width = length = 0;
 }
 
-Image::Image(ImageProcesing::ImageType _format, int _width, int _length)
+Image::Image(const std::string& _file)
 {
-	setFormat(_format);
-	setWidth(_width);
-	setLength(_length);
+	std::ifstream input(_file);
+	if (!input)
+		throw std::runtime_error("File is bad!");
+
+	setFileName(_file);
+	setFormat(_file);
+	
+	std::string inputWidthTxt;
+	std::string inputLengthTxt;
+	std::string skip;
+
+	input >> skip >> inputWidthTxt >> inputLengthTxt;
+
+	setWidth(getNumb(inputWidthTxt));
+	setLength(getNumb(inputLengthTxt));
 }
 
-void Image::setFormat(ImageProcesing::ImageType _format)
+void Image::setFormat(const std::string& _format)
 {
-	if (_format != ImageProcesing::ImageType::defaultType)
-	{
-		format = _format;
-	}
-	else throw std::runtime_error("Invalid format for iamge!");
+	if (_format == ".ppm")
+		format = ImageProcesing::ImageType::P3;
+	else if (_format == ".pgm")
+		format = ImageProcesing::ImageType::P2;
+	else if (_format == ".pbm")
+		format = ImageProcesing::ImageType::P1;
+	else throw std::invalid_argument("Invalid image type");
 }
 
 //taq proverka nujna li e
@@ -54,18 +69,24 @@ void Image::undo()
 
 void Image::setFileName(const std::string& _fileName)
 {
-	size_t fileNameSize = _fileName.size();
+	if (!_fileName.c_str())
+	{
+		throw std::invalid_argument("Invalid file name!");
+	}
+
+	size_t fileNameSize = _fileName.size()-4;
 	for (size_t i = 0; i < fileNameSize; ++i)
 	{
 		if ((_fileName[i] < 'A' || _fileName[i] > 'Z') &&
-			(_fileName[i] < 'a' || _fileName[i]> 'z') && 
-			_fileName[i] != '.' && _fileName[i]!=' ')
+			(_fileName[i] < 'a' || _fileName[i]> 'z') &&
+			(_fileName[i] < '0' || _fileName[i] >'9'&&
+			_fileName[i] !='.'&& _fileName[i] != '_'))
 		{
 			throw std::invalid_argument("Inavalid file name!");
 		}
 	}
-	
 	fileName = _fileName;
+	fileName.erase(fileName.size() - 4);
 }
 
 void Image::setWidth(int _width)

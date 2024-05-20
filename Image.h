@@ -32,7 +32,7 @@ class Image
 {
 public:
 	Image();
-	Image(ImageProcesing::ImageType _format, int _width, int _length);
+	Image(const std::string& _file);
 	virtual ~Image() = default;
 
 //getters
@@ -46,7 +46,7 @@ public:
 
 //methods
 public:
-	virtual void grayScale()  = 0;
+	virtual void grayScale()  = 0; // da ostavq tazi funkciq samo v PPM
 	virtual void monochrome() = 0;
 	virtual void negative() = 0;
 
@@ -57,16 +57,20 @@ public:
  
     //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY);
 
-	void addCommand(ImageProcesing::Commands command);
 	void redo();
 	void undo();
 
-//setters
 protected:
-	virtual void setFileName(const std::string& _fileName);
+	void addCommand(ImageProcesing::Commands command);
+
+	void setFormat(const std::string& _format);
+
+//setters
+private:
+	void setFileName(const std::string& _fileName);
 	void setWidth(int _width);
 	void setLength(int _length);
-	void setFormat(ImageProcesing::ImageType _format);
+
 //members
 private:
 	std::string fileName;
