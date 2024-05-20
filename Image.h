@@ -63,7 +63,7 @@ public:
 protected:
 	void addCommand(ImageProcesing::Commands command);
 
-	void setFormat(const std::string& _format);
+	virtual void setFormat(const std::string& _format);
 
 //setters
 private:
