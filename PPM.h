@@ -11,13 +11,14 @@ public:
 	PPM(const std::string& _fileName);
 	virtual ~PPM() = default;
 
+	//getters
 public:
-	// set-er za matricata
-
 	const std::vector<std::vector<RGB>>& getMatrix()const;
 	unsigned char getMaxValue()const;
-	void save()const;
 
+	virtual void save()const override;
+
+	//functions
 public:
 	virtual void grayScale() override;
 	virtual void monochrome() override;
@@ -29,17 +30,23 @@ public:
 	virtual void flipLeft() override;
 
 	//virtual void crop(int topLeftX, int topLeftY, int botRightX, int botRightY) override;
+
+	//helper protected functions 
 protected:
 	void transposeMatrix();
 	void reverseColumns();
 	void reverseRows();
+	//setters
 private:
-	virtual void setFileName(const std::string& _fileName) override;
-	void checkLastFour(const std::string& _fileName)const;
 	void setMatrix(std::ifstream& input);
 	void setMaxValue(int _maxValue);
-	void setFileHeader(std::string& inputFormatTxt, std::string& inputWidthTxt, std::string& inputLengthTxt, std::string& inputMaxValueTxt);
-	int  getNumb(std::string& str);
+	virtual void setFormat(const std::string& _format) override;
+	//helper private functions
+private:
+	void getModifiedFile(std::string& _modifiedFileName)const;
+	void writeFileHeader(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
+	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
+
 private:
 	std::vector<std::vector<RGB>> pixels;
 	unsigned char maxValue;

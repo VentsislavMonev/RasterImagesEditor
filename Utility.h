@@ -40,3 +40,14 @@ std::string getString(int numb)
 	}
 	return result;
 }
+
+//gets the current time and transfers it to string
+std::string getModifiedTime()
+{
+	time_t time = std::time(0);
+	tm date;
+	localtime_s(&date, &time);
+	std::string modifiedTime = getString(date.tm_year + 1900) + getString(date.tm_mon + 1) + getString(date.tm_mday) +
+		getString(date.tm_hour) + getString(date.tm_min) + getString(date.tm_sec);
+	return modifiedTime;
+}

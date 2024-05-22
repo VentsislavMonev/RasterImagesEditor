@@ -1,46 +1,24 @@
 #include "PPM.h"
+#include "Utility.h"
 
-PPM::PPM(const std::string& _fileName)
+PPM::PPM(const std::string& _fileName) :Image(_fileName)
 {
-	setFileName(_fileName);
 	std::ifstream input(_fileName);
 
 	if (!input)
 		throw std::runtime_error("File is bad!");
 
+	std::string skip;
 	std::string inputFormatTxt;
-	std::string inputWidthTxt;
-	std::string inputLengthTxt;
 	std::string inputMaxValueTxt;
 	
-	input >> inputFormatTxt >> inputWidthTxt >> inputLengthTxt >> inputMaxValueTxt;
-	setFileHeader(inputFormatTxt, inputWidthTxt, inputLengthTxt, inputMaxValueTxt);
+	input >> inputFormatTxt >> skip >> skip >> inputMaxValueTxt;
 
+	setFormat(inputFormatTxt);
+	setMaxValue(getNumb(inputMaxValueTxt));
 	setMatrix(input);
+
 	input.close();
-}
-
-void PPM::setFileName(const std::string& _fileName)
-{
-	if (!_fileName.c_str())
-	{
-		throw std::invalid_argument("Invalid file name!");
-	}
-	//checkLastFour(_fileName);		//tva ne tuka
-	Image::setFileName(_fileName);
-}
-
-void PPM::checkLastFour(const std::string& _fileName) const
-{
-	size_t fileNameSize = _fileName.size();
-	if (_fileName.at(fileNameSize - 4) != '.' ||
-		_fileName.at(fileNameSize - 3) != 'p' ||
-		_fileName.at(fileNameSize - 2) != 'p' ||
-		_fileName.at(fileNameSize - 1) != 'm')
-	{
-		throw std::invalid_argument("Invalid file name!");
-	}
-
 }
 
 void PPM::setMatrix(std::ifstream& input)
@@ -51,17 +29,15 @@ void PPM::setMatrix(std::ifstream& input)
 	int red;
 	int green;
 	int blue;
-	int aloda = 0;//
 
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
 	std::vector<RGB> row;
+
 	for (size_t i = 0; i < width; ++i)
 	{
 		for (size_t j = 0; j < length; ++j)
 		{
-			if (i == 1 && j == 0)//
-				aloda = 1;//
 			input >> red >> green >> blue;
 			RGB pixel(red, green, blue);
 			row.push_back(pixel);
@@ -81,6 +57,12 @@ void PPM::setMaxValue(int _maxValue)
 		maxValue = _maxValue;
 }
 
+void PPM::setFormat(const std::string& _format)
+{
+	if (_format != "P3")
+		throw std::invalid_argument("Invalid image format");
+}
+
 const std::vector<std::vector<RGB>>& PPM::getMatrix() const
 {
 	return pixels;
@@ -93,54 +75,39 @@ unsigned char PPM::getMaxValue() const
 
 void PPM::save() const
 {
-	std::string newFileName = "geicho.ppm";
-	std::ofstream newImage(newFileName);
+	//gets file modified name
+	std::string modifiedFile;
+	getModifiedFile(modifiedFile);
+	
+	//opens file with given name
+	std::ofstream newImage(modifiedFile);
 	if (!newImage)
 		throw std::runtime_error("Bad file!");
 
 	unsigned short width = getWidth();
 	unsigned short length= getLength();
-	newImage << "P3" << std::endl;
-	newImage << width << " " << length << std::endl;
-	newImage << (int)getMaxValue()<< std::endl;
-	int da = 0;
-	for (size_t i = 0; i < width; ++i)
-	{
-		for (size_t j = 0; j < length; ++j)
-		{
-			if (i == 1)
-				da=1;
-			newImage << (unsigned)pixels[i][j].r() << ' ' << (unsigned)pixels[i][j].g() << ' ' << (unsigned)pixels[i][j].b() << std::endl;
-		}
-	}
+
+	writeFileHeader(newImage, width, length);
+	writeMatrix(newImage, width, length);
 
 	newImage.close();
 }
 
 void PPM::grayScale()
 {
-	unsigned char grayScaleValue = 0;
-	
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
 	for (size_t i = 0; i < width; ++i)
 	{
 		for (size_t j = 0; j < length; ++j)
 		{
-			grayScaleValue= pixels[i][j].r() * 0.2126 + pixels[i][j].g() * 0.7152 + pixels[i][j].b() * 0.0722;
-			pixels[i][j].setEqual(grayScaleValue);
+			pixels[i][j].setEqual(pixels[i][j].getGrayScaleValue());
 		}
 	}
 }
 
-//ako se setq po-dobur nachin ili nqkak si da preizpolzvam koda ot grayscale
 void PPM::monochrome()
 {
-	unsigned char grayScaleValue = 0;
-	const float colorimetricValueRed   = 0.2126;
-	const float colorimetricValueGreen = 0.7152;
-	const float colorimetricValueBlue  = 0.0722;
-
 	unsigned short width  = getWidth();
 	unsigned short lenght = getLength();
 
@@ -148,11 +115,9 @@ void PPM::monochrome()
 	{
 		for (size_t j = 0; j < lenght; ++j)
 		{
-			grayScaleValue = pixels[i][j].r() * colorimetricValueRed + pixels[i][j].g() * colorimetricValueGreen + pixels[i][j].b() * colorimetricValueBlue;
-			if (grayScaleValue < maxValue/2)
-				grayScaleValue = 0;
-			else grayScaleValue = maxValue;
-			pixels[i][j].setEqual(grayScaleValue);
+			if (pixels[i][j].getGrayScaleValue() < maxValue / 2)
+				pixels[i][j].setEqual(0);
+			else pixels[i][j].setEqual(maxValue);
 		}
 	}
 }
@@ -221,43 +186,39 @@ void PPM::reverseRows()
 			std::swap(pixels[i][j], pixels[i][columnsCount-1-i]);
 }
 
-void PPM::setFileHeader(std::string& inputFormatTxt, std::string& inputWidthTxt, std::string& inputLengthTxt, std::string& inputMaxValueTxt)
+void PPM::getModifiedFile(std::string& _modifiedFile) const
 {
-	ImageProcesing::ImageType inputFormat;
-	int inputWidth;
-	int inputLength;
-	int inputMaxValue;
+	std::string modifiedTime = getModifiedTime();
 
-	if (inputFormatTxt != "P3")
-	{
-		inputFormat = ImageProcesing::ImageType::defaultType;
-	}
-	else inputFormat = ImageProcesing::ImageType::P3;
-	inputWidth = getNumb(inputWidthTxt);
-	inputLength = getNumb(inputLengthTxt);
-	inputMaxValue = getNumb(inputMaxValueTxt);
+	//adds the 2 strings together
+	_modifiedFile = getFileName() + modifiedTime;
 
-	Image::setFormat(inputFormat);
-	Image::setWidth(inputWidth);
-	Image::setLength(inputLength);
-	setMaxValue(inputMaxValue);
+	//adds the file type to it
+	_modifiedFile.append(".ppm");
 }
 
-int PPM::getNumb(std::string& str)
+void PPM::writeFileHeader(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
 {
-	size_t i = 0;
-	int sign = 1;
-	int number = 0;
-	if (str[i] == '-')
+	if (!newImage)
+		throw std::runtime_error("Bad file!");
+
+	newImage << "P3" << std::endl;
+	newImage << _width << " " << _length << std::endl;
+	newImage << (unsigned)getMaxValue() << std::endl;
+}
+
+void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
+{
+	if (!newImage)
+		throw std::runtime_error("Bad file!");
+
+	for (size_t i = 0; i < _width; ++i)
 	{
-		sign = -1;
-		++i;
+		for (size_t j = 0; j < _length; ++j)
+		{
+			newImage << static_cast<unsigned>(pixels[i][j].r()) << ' ' 
+					 << static_cast<unsigned>(pixels[i][j].g()) << ' ' 
+					 << static_cast<unsigned>(pixels[i][j].b()) << std::endl;
+		}
 	}
-	for (i ; i < str.size(); ++i)
-	{
-		if (str[i] < '0' || str[i]>'9') throw std::invalid_argument("Invalid input!");
-		number = number * 10 + (str[i] - '0');
-	}
-	number = number * sign;
-	return number;
 }

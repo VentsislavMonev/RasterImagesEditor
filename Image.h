@@ -55,10 +55,12 @@ public:
 	virtual void flipTop()	  = 0;
 	virtual void flipLeft()   = 0;
  
-    //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY);
+    //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
 
 	void redo();
 	void undo();
+
+	virtual void save()const = 0;
 
 protected:
 	void addCommand(ImageProcesing::Commands command);
