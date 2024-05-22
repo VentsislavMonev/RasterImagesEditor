@@ -28,11 +28,12 @@ Image::Image(const std::string& _file)
 
 void Image::setFormat(const std::string& _format)
 {
-	if (_format == ".ppm")
+	std::string inputFormat=_format.substr(_format.size()-4);
+	if (inputFormat == ".ppm")
 		format = ImageProcesing::ImageType::P3;
-	else if (_format == ".pgm")
+	else if (inputFormat == ".pgm")
 		format = ImageProcesing::ImageType::P2;
-	else if (_format == ".pbm")
+	else if (inputFormat == ".pbm")
 		format = ImageProcesing::ImageType::P1;
 	else throw std::invalid_argument("Invalid image type");
 }

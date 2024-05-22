@@ -1,9 +1,9 @@
 #include "PPM.h"
 #include "Utility.h"
 
-PPM::PPM(const std::string& _fileName) :Image(_fileName)
+PPM::PPM(const std::string& _file) :Image(_file)
 {
-	std::ifstream input(_fileName);
+	std::ifstream input(_file);
 
 	if (!input)
 		throw std::runtime_error("File is bad!");
@@ -34,9 +34,9 @@ void PPM::setMatrix(std::ifstream& input)
 	unsigned short length = getLength();
 	std::vector<RGB> row;
 
-	for (size_t i = 0; i < width; ++i)
+	for (size_t i = 0; i < length; ++i)
 	{
-		for (size_t j = 0; j < length; ++j)
+		for (size_t j = 0; j < width; ++j)
 		{
 			input >> red >> green >> blue;
 			RGB pixel(red, green, blue);
@@ -73,24 +73,31 @@ unsigned char PPM::getMaxValue() const
 	return maxValue;
 }
 
-void PPM::save() const
+void PPM::save()
 {
-	//gets file modified name
-	std::string modifiedFile;
-	getModifiedFile(modifiedFile);
+	if (!getCommandsToDo().empty())
+	{
+		manageCommands();
+
+		//gets file modified name
+		std::string modifiedFile;
+		getModifiedFile(modifiedFile);
+
+		//opens file with given name
+		std::ofstream newImage(modifiedFile);
+		if (!newImage)
+			throw std::runtime_error("Bad file!");
+
+		unsigned short width = getWidth();
+		unsigned short length = getLength();
+
+		writeFileHeader(newImage, width, length);
+		writeMatrix(newImage, width, length);
+
+		newImage.close();
+	}
+	else return;
 	
-	//opens file with given name
-	std::ofstream newImage(modifiedFile);
-	if (!newImage)
-		throw std::runtime_error("Bad file!");
-
-	unsigned short width = getWidth();
-	unsigned short length= getLength();
-
-	writeFileHeader(newImage, width, length);
-	writeMatrix(newImage, width, length);
-
-	newImage.close();
 }
 
 void PPM::grayScale()
@@ -141,7 +148,7 @@ void PPM::rotateLeft()
 {
 	transposeMatrix();
 
-	reverseColumns();
+	reverseRows();
 }
 
 void PPM::rotateRight()
@@ -153,37 +160,48 @@ void PPM::rotateRight()
 
 void PPM::flipTop()
 {
-	reverseColumns();
+	reverseRows();
 }
 
 void PPM::flipLeft()
 {
-	reverseRows();
+	reverseColumns();
 }
 
 void PPM::transposeMatrix()
 {
-	unsigned short width = getWidth();
-	unsigned short lenght = getLength();
-	for (size_t i = 0; i < width; ++i)
-		for (size_t j = 0; j < lenght; ++j)
-			std::swap(pixels[i][j], pixels[j][i]);
+	size_t width = getWidth();
+	size_t length = getLength();
+	RGB basic;
+	std::vector<std::vector<RGB>> transponsedMatrix(width, std::vector<RGB>(length, basic));
+	for (size_t i = 0; i < length; ++i)
+	{
+		for (size_t j = 0; j < width; ++j)
+		{
+			transponsedMatrix[j][i] = pixels[i][j];
+		}
+	}
+
+	pixels = transponsedMatrix;
+	setWidth(length);
+	setLength(width);
 }
 
 void PPM::reverseColumns()
 {
+	unsigned short columnsCount = getWidth();
 	unsigned short rowsCount = getLength();
-	for (size_t i = 0; i < rowsCount/2; ++i)
-			std::swap(pixels[i], pixels[rowsCount-1-i]);
+	for (size_t i = 0; i < rowsCount; ++i)
+		for (size_t j = 0; j < columnsCount/2; ++j)
+			std::swap(pixels[i][j], pixels[i][columnsCount-1-j]);
 }
 
 void PPM::reverseRows()
 {
-	unsigned short columnsCount = getWidth();
-	unsigned short lenght = getLength();
-	for (size_t i = 0; i < columnsCount; ++i)
-		for (size_t j = 0; j < lenght/2; ++j)
-			std::swap(pixels[i][j], pixels[i][columnsCount-1-i]);
+	unsigned short columnsCount = getLength();
+	for (size_t i = 0; i < columnsCount /2; ++i)
+			std::swap(pixels[i], pixels[columnsCount -1-i]);
+
 }
 
 void PPM::getModifiedFile(std::string& _modifiedFile) const
@@ -197,6 +215,7 @@ void PPM::getModifiedFile(std::string& _modifiedFile) const
 	_modifiedFile.append(".ppm");
 }
 
+// da q dobavq v image
 void PPM::writeFileHeader(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
 {
 	if (!newImage)
@@ -207,18 +226,59 @@ void PPM::writeFileHeader(std::ofstream& newImage, unsigned short _width, unsign
 	newImage << (unsigned)getMaxValue() << std::endl;
 }
 
+// da q dobavq v image
 void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
 {
 	if (!newImage)
 		throw std::runtime_error("Bad file!");
 
-	for (size_t i = 0; i < _width; ++i)
+	for (size_t i = 0; i < _length; ++i)
 	{
-		for (size_t j = 0; j < _length; ++j)
+		for (size_t j = 0; j < _width; ++j)
 		{
 			newImage << static_cast<unsigned>(pixels[i][j].r()) << ' ' 
 					 << static_cast<unsigned>(pixels[i][j].g()) << ' ' 
 					 << static_cast<unsigned>(pixels[i][j].b()) << std::endl;
 		}
 	}
+}
+
+void PPM::manageCommands()
+{
+	int rotationsLeft  = 0;
+	int rotationsRight = 0;
+	int flipsTop       = 0;
+	int flipsLeft	   = 0;
+
+	//manages commands
+	size_t commandsCount = getCommandsToDo().size();
+	for (size_t i = 0; i < commandsCount; ++i)
+	{
+		switch (getCommandsToDo()[i])
+		{
+		case ImageProcesing::Commands::monochrome:	monochrome();	  break;
+		case ImageProcesing::Commands::grayscale:	grayScale();	  break;
+		case ImageProcesing::Commands::negative:	negative();		  break;
+		case ImageProcesing::Commands::rotateLeft:	++rotationsLeft;  break;
+		case ImageProcesing::Commands::rotateRight: ++rotationsRight; break;
+		case ImageProcesing::Commands::flipTop:		++flipsTop;		  break;
+		case ImageProcesing::Commands::flipLeft:	++flipsLeft;	  break;
+
+		case ImageProcesing::Commands::defaultCommand:
+			break;
+		}
+	}
+
+	//manages rotations
+	rotationsLeft = rotationsLeft % 4;
+	rotationsRight = rotationsRight % 4;
+	rotationsRight = (rotationsRight - rotationsLeft) % 4;
+	for (size_t i = 0; i < rotationsRight; ++i)
+	{
+		rotateRight();
+	}
+
+	//manages flips
+	if (flipsTop % 2) flipTop();
+	if (flipsLeft % 2) flipLeft();
 }

@@ -8,7 +8,7 @@ class PPM:public Image
 {
 public:
 	PPM() = default;
-	PPM(const std::string& _fileName);
+	PPM(const std::string& _file);
 	virtual ~PPM() = default;
 
 	//getters
@@ -16,7 +16,7 @@ public:
 	const std::vector<std::vector<RGB>>& getMatrix()const;
 	unsigned char getMaxValue()const;
 
-	virtual void save()const override;
+	virtual void save() override;
 
 	//functions
 public:
@@ -46,6 +46,7 @@ private:
 	void getModifiedFile(std::string& _modifiedFileName)const;
 	void writeFileHeader(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
+	void manageCommands();
 
 private:
 	std::vector<std::vector<RGB>> pixels;

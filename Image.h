@@ -16,8 +16,8 @@ namespace ImageProcesing
 
 	enum class Commands
 	{
-		grayscale,
 		monochrome,
+		grayscale,
 		negative,
 		rotateLeft,
 		rotateRight,
@@ -60,19 +60,17 @@ public:
 	void redo();
 	void undo();
 
-	virtual void save()const = 0;
-
-protected:
+	virtual void save() = 0;
 	void addCommand(ImageProcesing::Commands command);
 
-	virtual void setFormat(const std::string& _format);
-
-//setters
-private:
-	void setFileName(const std::string& _fileName);
+protected:
 	void setWidth(int _width);
 	void setLength(int _length);
 
+//setters
+private:
+	virtual void setFormat(const std::string& _format);
+	void setFileName(const std::string& _fileName);
 //members
 private:
 	std::string fileName;

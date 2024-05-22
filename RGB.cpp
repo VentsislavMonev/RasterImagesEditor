@@ -26,6 +26,7 @@ unsigned RGB::getGrayScaleValue() const
     result = r() * colorimetricValueRed +
              g() * colorimetricValueGreen +
              b() * colorimetricValueBlue;
+    return result;
 }
 
 void RGB::setEqual(int value)
