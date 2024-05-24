@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
 #include <vector>
-#include <fstream>
 #include <string>
 
 namespace ImageProcesing
@@ -41,14 +39,12 @@ public:
 	ImageProcesing::ImageType getFormat()const;
 	unsigned short getWidth()const;
 	unsigned short getLength()const;
-	const std::vector<ImageProcesing::Commands>& getCommandsToDo()const;
-	const std::vector<ImageProcesing::Commands>& getCommandsToNotDo()const;
 
 //methods
 public:
-	virtual void grayScale()  = 0; // da ostavq tazi funkciq samo v PPM
+	virtual void grayScale()  = 0;
 	virtual void monochrome() = 0;
-	virtual void negative() = 0;
+	virtual void negative()   = 0;
 
 	virtual void rotateLeft() = 0;
 	virtual void rotateRight()= 0;
@@ -57,20 +53,32 @@ public:
  
     //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
 
+	void addCommand(ImageProcesing::Commands command);
 	void redo();
 	void undo();
 
 	virtual void save() = 0;
-	void addCommand(ImageProcesing::Commands command);
+
+//matrix manipulation functions
+protected:
+	virtual void transposeMatrix() = 0;
+	virtual void reverseColumns()  = 0;
+	virtual void reverseRows()     = 0;
 
 protected:
 	void setWidth(int _width);
 	void setLength(int _length);
 
+	const std::vector<ImageProcesing::Commands>& getCommandsToDo()const;
+	const std::vector<ImageProcesing::Commands>& getCommandsToNotDo()const;
+
+	void getModifiedFile(std::string& _modifiedFileName)const;
+
 //setters
 private:
 	virtual void setFormat(const std::string& _format);
 	void setFileName(const std::string& _fileName);
+
 //members
 private:
 	std::string fileName;

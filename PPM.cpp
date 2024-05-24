@@ -1,5 +1,8 @@
 #include "PPM.h"
 #include "Utility.h"
+#include <fstream>
+#include <iostream>
+
 
 PPM::PPM(const std::string& _file) :Image(_file)
 {
@@ -91,7 +94,7 @@ void PPM::save()
 		unsigned short width = getWidth();
 		unsigned short length = getLength();
 
-		writeFileHeader(newImage, width, length);
+		writeFileHeader(newImage);
 		writeMatrix(newImage, width, length);
 
 		newImage.close();
@@ -104,9 +107,9 @@ void PPM::grayScale()
 {
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
-	for (size_t i = 0; i < width; ++i)
+	for (size_t i = 0; i < length; ++i)
 	{
-		for (size_t j = 0; j < length; ++j)
+		for (size_t j = 0; j < width; ++j)
 		{
 			pixels[i][j].setEqual(pixels[i][j].getGrayScaleValue());
 		}
@@ -118,9 +121,9 @@ void PPM::monochrome()
 	unsigned short width  = getWidth();
 	unsigned short lenght = getLength();
 
-	for (size_t i = 0; i < width; ++i)
+	for (size_t i = 0; i < lenght; ++i)
 	{
-		for (size_t j = 0; j < lenght; ++j)
+		for (size_t j = 0; j < width; ++j)
 		{
 			if (pixels[i][j].getGrayScaleValue() < maxValue / 2)
 				pixels[i][j].setEqual(0);
@@ -133,9 +136,9 @@ void PPM::negative()
 {
 	unsigned short width = getWidth();
 	unsigned short lenght = getLength();
-	for (size_t i = 0; i < width; ++i)
+	for (size_t i = 0; i < lenght; ++i)
 	{
-		for (size_t j = 0; j < lenght; ++j)
+		for (size_t j = 0; j < width; ++j)
 		{
 			pixels[i][j].setRed(maxValue - pixels[i][j].r());
 			pixels[i][j].setGreen(maxValue - pixels[i][j].g());
@@ -204,29 +207,15 @@ void PPM::reverseRows()
 
 }
 
-void PPM::getModifiedFile(std::string& _modifiedFile) const
-{
-	std::string modifiedTime = getModifiedTime();
-
-	//adds the 2 strings together
-	_modifiedFile = getFileName() + modifiedTime;
-
-	//adds the file type to it
-	_modifiedFile.append(".ppm");
-}
-
-// da q dobavq v image
-void PPM::writeFileHeader(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
+void PPM::writeFileHeader(std::ofstream& newImage) const
 {
 	if (!newImage)
 		throw std::runtime_error("Bad file!");
-
 	newImage << "P3" << std::endl;
-	newImage << _width << " " << _length << std::endl;
+	newImage << getWidth() << " " << getLength()<< std::endl;
 	newImage << (unsigned)getMaxValue() << std::endl;
 }
 
-// da q dobavq v image
 void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
 {
 	if (!newImage)
@@ -265,6 +254,7 @@ void PPM::manageCommands()
 		case ImageProcesing::Commands::flipLeft:	++flipsLeft;	  break;
 
 		case ImageProcesing::Commands::defaultCommand:
+			throw std::runtime_error("Invalid command");
 			break;
 		}
 	}

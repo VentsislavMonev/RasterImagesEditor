@@ -1,5 +1,7 @@
 #include "Image.h"
 #include "Utility.h"
+#include <fstream>
+#include <iostream>
 
 Image::Image()
 {
@@ -108,6 +110,17 @@ void Image::setLength(int _length)
 		throw std::invalid_argument("Length is too big!");
 	else
 		length = _length;
+}
+
+void Image::getModifiedFile(std::string& _modifiedFile) const
+{
+	std::string modifiedTime = getModifiedTime();
+
+	//adds the 2 strings together
+	_modifiedFile = fileName + modifiedTime;
+
+	//adds the file type to it
+	_modifiedFile.append(".ppm");
 }
 
 const std::string& Image::getFileName() const
