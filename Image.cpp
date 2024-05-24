@@ -1,7 +1,7 @@
-#include "Image.h"
-#include "Utility.h"
 #include <fstream>
 #include <iostream>
+#include "Image.h"
+#include "Utility.h"
 
 Image::Image()
 {

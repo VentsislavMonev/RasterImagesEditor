@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 
 static const float colorimetricValueRed = 0.2126;
 static const float colorimetricValueGreen = 0.7152;

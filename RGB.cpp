@@ -1,3 +1,4 @@
+#include <iostream>
 #include "RGB.h"
 
 RGB::RGB() :red(0), green(0), blue(0) {}

@@ -1,7 +1,8 @@
-#include "PPM.h"
-#include "Utility.h"
 #include <fstream>
 #include <iostream>
+
+#include "PPM.h"
+#include "Utility.h"
 
 
 PPM::PPM(const std::string& _file) :Image(_file)
@@ -119,9 +120,9 @@ void PPM::grayScale()
 void PPM::monochrome()
 {
 	unsigned short width  = getWidth();
-	unsigned short lenght = getLength();
+	unsigned short length = getLength();
 
-	for (size_t i = 0; i < lenght; ++i)
+	for (size_t i = 0; i < length; ++i)
 	{
 		for (size_t j = 0; j < width; ++j)
 		{
@@ -135,8 +136,8 @@ void PPM::monochrome()
 void PPM::negative()
 {
 	unsigned short width = getWidth();
-	unsigned short lenght = getLength();
-	for (size_t i = 0; i < lenght; ++i)
+	unsigned short length = getLength();
+	for (size_t i = 0; i < length; ++i)
 	{
 		for (size_t j = 0; j < width; ++j)
 		{
@@ -213,7 +214,7 @@ void PPM::writeFileHeader(std::ofstream& newImage) const
 		throw std::runtime_error("Bad file!");
 	newImage << "P3" << std::endl;
 	newImage << getWidth() << " " << getLength()<< std::endl;
-	newImage << (unsigned)getMaxValue() << std::endl;
+	newImage << static_cast<unsigned>(getMaxValue()) << std::endl;
 }
 
 void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
