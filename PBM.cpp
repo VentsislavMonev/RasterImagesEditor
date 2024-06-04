@@ -1,10 +1,10 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "PGM.h"
+#include "PBM.h"
 #include "Utility.h"
 
-PGM::PGM(const std::string& _file) :Image(_file)
+PBM::PBM(const std::string& _file) :Image(_file)
 {
 	std::ifstream newImage(_file);
 
@@ -13,84 +13,54 @@ PGM::PGM(const std::string& _file) :Image(_file)
 
 	std::string skip;
 	std::string inputFormatTxt;
-	std::string inputMaxValueTxt;
 
-	newImage >> inputFormatTxt >> skip >> skip >> inputMaxValueTxt;
+	newImage >> inputFormatTxt >> skip >> skip;
 
 	setFormat(inputFormatTxt);
-	setMaxValue(getNumb(inputMaxValueTxt));
 	setMatrix(newImage);
 
 	newImage.close();
 }
 
-Image* PGM::clone() const
+Image* PBM::clone() const
 {
-	return new PGM(*this);
+	return new PBM(*this);
 }
 
 
-const std::vector<std::vector<unsigned char>>& PGM::getMatrix() const
-{
-	return pixels;
-}
-unsigned char PGM::getMaxValue() const
-{
-	return maxValue;
-}
-
-
-void PGM::monochrome()
+void PBM::negative()
 {
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
-
-	for (size_t i = 0; i < length; ++i)
+	for (size_t i = 0; i < length; i++)
 	{
-		for (size_t j = 0; j < width; ++j)
-		{
-			if (pixels[i][j] < maxValue / 2)
-				pixels[i][j] = 0;
-			else pixels[i][j] = maxValue;
-		}
-	}
-}
-void PGM::negative()
-{
-	unsigned short width = getWidth();
-	unsigned short length = getLength();
-	unsigned short value = 0;
-	for (size_t i = 0; i < length; ++i)
-	{
-		for (size_t j = 0; j < width; ++j)
+		for (size_t j = 0; j < width; j++)
 		{
 			pixels[i][j] = maxValue - pixels[i][j];
 		}
 	}
 }
 
-void PGM::rotateLeft()
+void PBM::rotateLeft()
 {
 	transposeMatrix();
-
 	reverseRows();
 }
-void PGM::rotateRight()
+void PBM::rotateRight()
 {
 	transposeMatrix();
-
 	reverseColumns();
 }
-void PGM::flipTop()
+void PBM::flipTop()
 {
 	reverseRows();
 }
-void PGM::flipLeft()
+void PBM::flipLeft()
 {
 	reverseColumns();
 }
 
-void PGM::save()
+void PBM::save()
 {
 	if (!getCommandsToDo().empty())
 	{
@@ -117,48 +87,62 @@ void PGM::save()
 }
 
 
-void PGM::transposeMatrix()
+const std::vector<std::vector<bool>>& PBM::getMatrix() const
+{
+	return pixels;
+}
+bool PBM::getMaxValue()
+{
+	return maxValue;
+}
+
+
+void PBM::transposeMatrix()
 {
 	size_t width = getWidth();
 	size_t length = getLength();
-	std::vector<std::vector<unsigned char>> transponsedMatrix(width, std::vector<unsigned char>(length, unsigned char()));
+	std::vector<std::vector<bool>> transponsedMatrix(width, std::vector<bool>(length, bool()));
 	for (size_t i = 0; i < length; ++i)
-	{
 		for (size_t j = 0; j < width; ++j)
-		{
 			transponsedMatrix[j][i] = pixels[i][j];
-		}
-	}
 
 	pixels = transponsedMatrix;
 	setWidth(length);
 	setLength(width);
 }
-void PGM::reverseColumns()
+void PBM::reverseColumns()
 {
-	unsigned short columnsCount = getWidth();
-	unsigned short rowsCount = getLength();
-	for (size_t i = 0; i < rowsCount; ++i)
-		for (size_t j = 0; j < columnsCount / 2; ++j)
-			std::swap(pixels[i][j], pixels[i][columnsCount - 1 - j]);
+	size_t columnsCount = getWidth();
+	size_t rowsCount = getLength();
+	bool pixel = 0;
+	for (size_t i = 0; i < rowsCount; i++)
+	{
+		for (size_t j = 0; j < columnsCount; j++)
+		{
+			pixel = pixels[i][j];
+			pixels[i][j] = pixels[i][columnsCount - 1 - j];
+			pixels[i][columnsCount - 1 - j] = pixel;
+		}
+	}
 }
-void PGM::reverseRows()
+void PBM::reverseRows()
 {
-	unsigned short columnsCount = getLength();
-	for (size_t i = 0; i < columnsCount / 2; ++i)
+	size_t columnsCount = getWidth();
+	size_t rowsCount = getLength();
+	for (size_t i = 0; i < columnsCount; i++)
 		std::swap(pixels[i], pixels[columnsCount - 1 - i]);
 }
 
 
-void PGM::writeFileHeader(std::ofstream& newImage) const
+void PBM::writeFileHeader(std::ofstream& newImage) const
 {
 	if (!newImage)
 		throw std::runtime_error("Bad file!");
-	newImage << "P2" << std::endl;
+	newImage << "P1" << std::endl;
 	newImage << getWidth() << " " << getLength() << std::endl;
-	newImage << static_cast<unsigned>(getMaxValue()) << std::endl;
 }
-void PGM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
+
+void PBM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length) const
 {
 	if (!newImage)
 		throw std::runtime_error("Bad file!");
@@ -167,12 +151,13 @@ void PGM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 	{
 		for (size_t j = 0; j < _width; ++j)
 		{
-			newImage << static_cast<unsigned>(pixels[i][j])<< ' ';
+			newImage << pixels[i][j] << ' ';
 		}
 		newImage << std::endl;
 	}
 }
-void PGM::manageCommands()
+
+void PBM::manageCommands()
 {
 	int rotationsLeft = 0;
 	int rotationsRight = 0;
@@ -215,16 +200,15 @@ void PGM::manageCommands()
 	if (flipsLeft % 2) flipLeft();
 }
 
-
-void PGM::setMatrix(std::ifstream& newImage)
+void PBM::setMatrix(std::ifstream& newImage)
 {
 	if (!newImage)
 		throw std::runtime_error("File is bad!");
 
-	int inputValue;
+	bool inputValue;
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
-	std::vector<unsigned char> row;
+	std::vector<bool> row;
 
 	for (size_t i = 0; i < length; ++i)
 	{
@@ -237,26 +221,15 @@ void PGM::setMatrix(std::ifstream& newImage)
 		row.clear();
 	}
 }
-void PGM::setMaxValue(int _maxValue)
+
+void PBM::setFormat(const std::string& _format)
 {
-	if (_maxValue <= 0)
-		throw std::invalid_argument("Max value can`t be less than or equal to 0");
-	else if (_maxValue > std::numeric_limits<unsigned char>().max())
-		throw std::invalid_argument("Max value can`t be bigger than 255");
-	else
-		maxValue = _maxValue;
-}
-void PGM::setFormat(const std::string& _format)
-{
-	if (_format != "P2")
+	if (_format != "P1")
 		throw std::invalid_argument("Invalid image format");
 }
-unsigned char PGM::setValue(int _value)
+bool PBM::setValue(int _value)
 {
-	unsigned char value = 0;
-	if (_value > maxValue)    throw std::invalid_argument("Value can only be less than or equal to " + static_cast<unsigned>(maxValue));
-	else if (_value < 0) throw std::invalid_argument("Value can only be more than or equal to 0!");
-	else value = _value;
-	return value;
+	if (_value == 0 || _value == 1)
+		return _value;
+	else throw std::invalid_argument("Value can be only 0 or 1");
 }
-

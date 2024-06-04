@@ -1,8 +1,8 @@
 #pragma once
 
-static const float colorimetricValueRed = 0.2126;
-static const float colorimetricValueGreen = 0.7152;
-static const float colorimetricValueBlue = 0.0722;
+static const float colorimetricValueRed = 0.2126f;
+static const float colorimetricValueGreen = 0.7152f;
+static const float colorimetricValueBlue = 0.0722f;
 
 class RGB
 {

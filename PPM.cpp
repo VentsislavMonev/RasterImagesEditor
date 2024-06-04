@@ -7,27 +7,32 @@
 
 PPM::PPM(const std::string& _file) :Image(_file)
 {
-	std::ifstream input(_file);
+	std::ifstream newImage(_file);
 
-	if (!input)
+	if (!newImage)
 		throw std::runtime_error("File is bad!");
 
 	std::string skip;
 	std::string inputFormatTxt;
 	std::string inputMaxValueTxt;
 	
-	input >> inputFormatTxt >> skip >> skip >> inputMaxValueTxt;
+	newImage >> inputFormatTxt >> skip >> skip >> inputMaxValueTxt;
 
 	setFormat(inputFormatTxt);
 	setMaxValue(getNumb(inputMaxValueTxt));
-	setMatrix(input);
+	setMatrix(newImage);
 
-	input.close();
+	newImage.close();
 }
 
-void PPM::setMatrix(std::ifstream& input)
+Image* PPM::clone() const
 {
-	if (!input)
+	return new PPM(*this);
+}
+
+void PPM::setMatrix(std::ifstream& newImage)
+{
+	if (!newImage)
 		throw std::runtime_error("File is bad!");
 
 	int red;
@@ -42,7 +47,7 @@ void PPM::setMatrix(std::ifstream& input)
 	{
 		for (size_t j = 0; j < width; ++j)
 		{
-			input >> red >> green >> blue;
+			newImage >> red >> green >> blue;
 			RGB pixel(red, green, blue);
 			row.push_back(pixel);
 		}
@@ -75,6 +80,11 @@ const std::vector<std::vector<RGB>>& PPM::getMatrix() const
 unsigned char PPM::getMaxValue() const
 {
 	return maxValue;
+}
+
+void PPM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+{
+
 }
 
 void PPM::save()
@@ -174,8 +184,8 @@ void PPM::flipLeft()
 
 void PPM::transposeMatrix()
 {
-	size_t width = getWidth();
-	size_t length = getLength();
+	unsigned short width = getWidth();
+	unsigned short length = getLength();
 	RGB basic;
 	std::vector<std::vector<RGB>> transponsedMatrix(width, std::vector<RGB>(length, basic));
 	for (size_t i = 0; i < length; ++i)
@@ -206,6 +216,22 @@ void PPM::reverseRows()
 	for (size_t i = 0; i < columnsCount /2; ++i)
 			std::swap(pixels[i], pixels[columnsCount -1-i]);
 
+}
+
+bool PPM::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY) const
+{
+	unsigned short width  = getWidth();
+	unsigned short length = getLength();
+	if (topLeftX >= botRightX || botRightY >= topLeftY)
+		throw std::invalid_argument("Invalid Coordinates");
+	if (topLeftX < 0)  topLeftX = 0;
+	if (topLeftY < 0)  topLeftY = 0;
+	if (botRightX < 0) botRightX = 0;
+	if (botRightY < 0) botRightY = 0;
+	
+	if(topLeftX>width-1)
+
+	
 }
 
 void PPM::writeFileHeader(std::ofstream& newImage) const
@@ -239,6 +265,8 @@ void PPM::manageCommands()
 	int rotationsRight = 0;
 	int flipsTop       = 0;
 	int flipsLeft	   = 0;
+	bool isMonochrome = false;
+	bool isGrayscale  = false;
 
 	//manages commands
 	size_t commandsCount = getCommandsToDo().size();
@@ -246,8 +274,20 @@ void PPM::manageCommands()
 	{
 		switch (getCommandsToDo()[i])
 		{
-		case ImageProcesing::Commands::monochrome:	monochrome();	  break;
-		case ImageProcesing::Commands::grayscale:	grayScale();	  break;
+		case ImageProcesing::Commands::monochrome:  
+			if (!isMonochrome) 
+			{ 
+				monochrome();
+				isMonochrome = true;
+			}
+			break;
+		case ImageProcesing::Commands::grayscale:	
+			if (!isGrayscale)
+			{
+				grayScale(); 
+				isGrayscale = true;
+			}
+			break;
 		case ImageProcesing::Commands::negative:	negative();		  break;
 		case ImageProcesing::Commands::rotateLeft:	++rotationsLeft;  break;
 		case ImageProcesing::Commands::rotateRight: ++rotationsRight; break;
@@ -260,10 +300,13 @@ void PPM::manageCommands()
 		}
 	}
 
+	//da go pravq li taka ili s dva for-a
 	//manages rotations
 	rotationsLeft = rotationsLeft % 4;
 	rotationsRight = rotationsRight % 4;
-	rotationsRight = (rotationsRight - rotationsLeft) % 4;
+	rotationsRight = rotationsRight - rotationsLeft;
+	if (rotationsRight < 0)
+		rotationsRight = 4 - rotationsRight * (-1);
 	for (size_t i = 0; i < rotationsRight; ++i)
 	{
 		rotateRight();

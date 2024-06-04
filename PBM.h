@@ -1,22 +1,16 @@
 #pragma once
+#include "Image.h"
 
-#include"Image.h"
-
-class PGM: public Image
+class PBM:public Image
 {
 public:
-	PGM() = default;
-	PGM(const std::string& _file);
-	virtual ~PGM()=default;
-
+	PBM()=default;
+	PBM(const  std::string& _file);
+	virtual ~PBM()=default;
 	virtual Image* clone() const override;
 
 public:
-	const std::vector<std::vector<unsigned char>>& getMatrix()const;
-	unsigned char getMaxValue()const;
-
-public:
-	virtual void monochrome() override;
+	virtual void monochrome() override {};
 	virtual void grayScale() override {}
 	virtual void negative() override;
 
@@ -26,6 +20,10 @@ public:
 	virtual void flipLeft() override;
 
 	virtual void save() override;
+
+public:
+	const std::vector<std::vector<bool>>& getMatrix()const;
+	static bool getMaxValue();
 
 protected:
 	virtual void transposeMatrix() override;
@@ -39,12 +37,12 @@ private:
 
 private:
 	void setMatrix(std::ifstream& newImage);
-	void setMaxValue(int _maxValue);
+
 	virtual void setFormat(const std::string& _format) override;
-	unsigned char setValue(int _value);
+	bool setValue(int _value);
 
 private:
-	std::vector<std::vector<unsigned char>> pixels;
-	unsigned char maxValue;
+	std::vector<std::vector<bool>> pixels;
+	static const bool maxValue = 1;
 };
 

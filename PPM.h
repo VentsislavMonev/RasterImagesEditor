@@ -10,6 +10,8 @@ public:
 	PPM(const std::string& _file);
 	virtual ~PPM() = default;
 
+	virtual Image* clone() const override;
+
 	//getters
 public:
 	const std::vector<std::vector<RGB>>& getMatrix()const;
@@ -26,7 +28,8 @@ public:
 	virtual void flipTop()	   override;
 	virtual void flipLeft()	   override;
 
-	//virtual void crop(int topLeftX, int topLeftY, int botRightX, int botRightY) override;
+	//da dobavq virtual i override
+	virtual void crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
 	virtual void save() override;
 
@@ -38,12 +41,13 @@ protected:
 
 	//setters
 private:
-	void setMatrix(std::ifstream& input);
+	void setMatrix(std::ifstream& newImage);
 	void setMaxValue(int _maxValue);
 	virtual void setFormat(const std::string& _format) override;
 
 	//helper private functions
 private:
+	bool validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)const;
 	void writeFileHeader(std::ofstream& newImage)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 	void manageCommands();
