@@ -82,8 +82,8 @@ void Image::setFileName(const std::string& _fileName)
 	{
 		if ((_fileName[i] < 'A' || _fileName[i] > 'Z') &&
 			(_fileName[i] < 'a' || _fileName[i]> 'z') &&
-			(_fileName[i] < '0' || _fileName[i] >'9'&&
-			_fileName[i] !='.'&& _fileName[i] != '_'))
+			(_fileName[i] < '0' || _fileName[i] >'9')&&
+			_fileName[i] !='.'&& _fileName[i] != '_')
 		{
 			throw std::invalid_argument("Inavalid file name!");
 		}

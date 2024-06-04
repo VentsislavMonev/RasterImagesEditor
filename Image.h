@@ -33,6 +33,8 @@ public:
 	Image(const std::string& _file);
 	virtual ~Image() = default;
 
+	virtual Image* clone() const = 0;
+
 //getters
 public:
 	const std::string& getFileName()const;
@@ -51,7 +53,7 @@ public:
 	virtual void flipTop()	  = 0;
 	virtual void flipLeft()   = 0;
  
-    //virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
+    virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
 
 	void addCommand(ImageProcesing::Commands command);
 	void redo();
