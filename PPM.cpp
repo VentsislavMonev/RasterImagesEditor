@@ -82,9 +82,30 @@ unsigned char PPM::getMaxValue() const
 	return maxValue;
 }
 
-void PPM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+bool PPM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 {
+	//validates the coordinates
+	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
+		return false;
 
+	unsigned short newWidth  = getWidth();
+	unsigned short newLength = getLength();
+
+	std::vector<std::vector<RGB>> newMatrix;
+	std::vector<RGB> row;
+
+	for (size_t i = topLeftY; i < topLeftY+newLength; ++i)
+	{
+		for (size_t j = topLeftX; j < topLeftX+newWidth; ++j)
+		{
+			row.push_back(pixels[i][j]);
+		}
+		newMatrix.push_back(row);
+		row.clear();
+	}
+
+	pixels = newMatrix;
+	return true;
 }
 
 void PPM::save()
@@ -218,22 +239,6 @@ void PPM::reverseRows()
 
 }
 
-bool PPM::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY) const
-{
-	unsigned short width  = getWidth();
-	unsigned short length = getLength();
-	if (topLeftX >= botRightX || botRightY >= topLeftY)
-		throw std::invalid_argument("Invalid Coordinates");
-	if (topLeftX < 0)  topLeftX = 0;
-	if (topLeftY < 0)  topLeftY = 0;
-	if (botRightX < 0) botRightX = 0;
-	if (botRightY < 0) botRightY = 0;
-	
-	if(topLeftX>width-1)
-
-	
-}
-
 void PPM::writeFileHeader(std::ofstream& newImage) const
 {
 	if (!newImage)
@@ -257,62 +262,4 @@ void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 					 << static_cast<unsigned>(pixels[i][j].b()) << std::endl;
 		}
 	}
-}
-
-void PPM::manageCommands()
-{
-	int rotationsLeft  = 0;
-	int rotationsRight = 0;
-	int flipsTop       = 0;
-	int flipsLeft	   = 0;
-	bool isMonochrome = false;
-	bool isGrayscale  = false;
-
-	//manages commands
-	size_t commandsCount = getCommandsToDo().size();
-	for (size_t i = 0; i < commandsCount; ++i)
-	{
-		switch (getCommandsToDo()[i])
-		{
-		case ImageProcesing::Commands::monochrome:  
-			if (!isMonochrome) 
-			{ 
-				monochrome();
-				isMonochrome = true;
-			}
-			break;
-		case ImageProcesing::Commands::grayscale:	
-			if (!isGrayscale)
-			{
-				grayScale(); 
-				isGrayscale = true;
-			}
-			break;
-		case ImageProcesing::Commands::negative:	negative();		  break;
-		case ImageProcesing::Commands::rotateLeft:	++rotationsLeft;  break;
-		case ImageProcesing::Commands::rotateRight: ++rotationsRight; break;
-		case ImageProcesing::Commands::flipTop:		++flipsTop;		  break;
-		case ImageProcesing::Commands::flipLeft:	++flipsLeft;	  break;
-
-		case ImageProcesing::Commands::defaultCommand:
-			throw std::runtime_error("Invalid command");
-			break;
-		}
-	}
-
-	//da go pravq li taka ili s dva for-a
-	//manages rotations
-	rotationsLeft = rotationsLeft % 4;
-	rotationsRight = rotationsRight % 4;
-	rotationsRight = rotationsRight - rotationsLeft;
-	if (rotationsRight < 0)
-		rotationsRight = 4 - rotationsRight * (-1);
-	for (size_t i = 0; i < rotationsRight; ++i)
-	{
-		rotateRight();
-	}
-
-	//manages flips
-	if (flipsTop % 2) flipTop();
-	if (flipsLeft % 2) flipLeft();
 }

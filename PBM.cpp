@@ -60,6 +60,32 @@ void PBM::flipLeft()
 	reverseColumns();
 }
 
+bool PBM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+{
+	//validates //validates the coordinates
+	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
+		return false;
+
+	unsigned short newWidth = getWidth();
+	unsigned short newLength = getLength();
+
+	std::vector<std::vector<bool>> newMatrix;
+	std::vector<bool> row;
+
+	for (size_t i = topLeftY; i < topLeftY + newLength; ++i)
+	{
+		for (size_t j = topLeftX; j < topLeftX + newWidth; ++j)
+		{
+			row.push_back(pixels[i][j]);
+		}
+		newMatrix.push_back(row);
+		row.clear();
+	}
+
+	pixels = newMatrix;
+	return true;
+}
+
 void PBM::save()
 {
 	if (!getCommandsToDo().empty())
@@ -157,48 +183,6 @@ void PBM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 	}
 }
 
-void PBM::manageCommands()
-{
-	int rotationsLeft = 0;
-	int rotationsRight = 0;
-	int flipsTop = 0;
-	int flipsLeft = 0;
-
-	//manages commands
-	size_t commandsCount = getCommandsToDo().size();
-	for (size_t i = 0; i < commandsCount; ++i)
-	{
-		switch (getCommandsToDo()[i])
-		{
-		case ImageProcesing::Commands::monochrome:	monochrome();	  break;
-		case ImageProcesing::Commands::grayscale:	grayScale();	  break;
-		case ImageProcesing::Commands::negative:	negative();		  break;
-		case ImageProcesing::Commands::rotateLeft:	++rotationsLeft;  break;
-		case ImageProcesing::Commands::rotateRight: ++rotationsRight; break;
-		case ImageProcesing::Commands::flipTop:		++flipsTop;		  break;
-		case ImageProcesing::Commands::flipLeft:	++flipsLeft;	  break;
-
-		case ImageProcesing::Commands::defaultCommand:
-			throw std::runtime_error("Invalid command");
-			break;
-		}
-	}
-
-	//manages rotations
-	rotationsLeft = rotationsLeft % 4;
-	rotationsRight = rotationsRight % 4;	
-	rotationsRight = rotationsRight - rotationsLeft;
-	if (rotationsRight < 0)
-		rotationsRight = 4 - rotationsRight * (-1);
-	for (size_t i = 0; i < rotationsRight; ++i)
-	{
-		rotateRight();
-	}
-
-	//manages flips
-	if (flipsTop % 2) flipTop();
-	if (flipsLeft % 2) flipLeft();
-}
 
 void PBM::setMatrix(std::ifstream& newImage)
 {

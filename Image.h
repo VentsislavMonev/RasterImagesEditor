@@ -53,7 +53,7 @@ public:
 	virtual void flipTop()	  = 0;
 	virtual void flipLeft()   = 0;
  
-    virtual void crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
+    virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
 
 	void addCommand(ImageProcesing::Commands command);
 	void redo();
@@ -74,12 +74,17 @@ protected:
 	const std::vector<ImageProcesing::Commands>& getCommandsToDo()const;
 	const std::vector<ImageProcesing::Commands>& getCommandsToNotDo()const;
 
+	void manageCommands();
 	void getModifiedFile(std::string& _modifiedFileName)const;
 
 //setters
 private:
 	virtual void setFormat(const std::string& _format);
 	void setFileName(const std::string& _fileName);
+	bool validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)const;
+
+	void manageRotations(int rotationsLeft, int rotationsRight);
+	void manageFlips(int flipsTop, int flipsLeft);
 
 //members
 private:

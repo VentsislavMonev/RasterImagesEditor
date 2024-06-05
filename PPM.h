@@ -28,8 +28,7 @@ public:
 	virtual void flipTop()	   override;
 	virtual void flipLeft()	   override;
 
-	//da dobavq virtual i override
-	virtual void crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
+	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
 	virtual void save() override;
 
@@ -47,10 +46,8 @@ private:
 
 	//helper private functions
 private:
-	bool validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)const;
 	void writeFileHeader(std::ofstream& newImage)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
-	void manageCommands();
 
 private:
 	std::vector<std::vector<RGB>> pixels;

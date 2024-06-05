@@ -25,6 +25,8 @@ public:
 	virtual void flipTop() override;
 	virtual void flipLeft() override;
 
+	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
+
 	virtual void save() override;
 
 protected:
@@ -35,7 +37,6 @@ protected:
 private:
 	void writeFileHeader(std::ofstream& newImage)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
-	void manageCommands();
 
 private:
 	void setMatrix(std::ifstream& newImage);
