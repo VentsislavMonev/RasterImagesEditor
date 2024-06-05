@@ -70,12 +70,12 @@ void copyPPM(const std::string& inputFilename, const std::string& outputFilename
 
 int main()
 {
-	std::string idontloveyouanymore = "seahorse.ascii.pbm";
+	std::string idontloveyouanymore = "da.ppm";
 	//Session aloda;
 	//aloda.addPPM(idontloveyouanymore);
 	//Session kvostaaAAAAA;
 	//kvostaaAAAAA = aloda;
-	PBM aaaa(idontloveyouanymore);
+	PPM aaaa(idontloveyouanymore);
 	
 	aaaa.addCommand(ImageProcesing::Commands::negative);
 	aaaa.save();

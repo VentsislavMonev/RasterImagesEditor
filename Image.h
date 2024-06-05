@@ -74,6 +74,8 @@ protected:
 	const std::vector<ImageProcesing::Commands>& getCommandsToDo()const;
 	const std::vector<ImageProcesing::Commands>& getCommandsToNotDo()const;
 
+	void skipComments(std::ifstream& file)const;
+
 	void manageCommands();
 	void getModifiedFile(std::string& _modifiedFileName)const;
 

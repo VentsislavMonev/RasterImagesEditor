@@ -16,7 +16,15 @@ PPM::PPM(const std::string& _file) :Image(_file)
 	std::string inputFormatTxt;
 	std::string inputMaxValueTxt;
 	
-	newImage >> inputFormatTxt >> skip >> skip >> inputMaxValueTxt;
+	skipComments(newImage);
+	newImage >> inputFormatTxt;
+	skipComments(newImage);
+	newImage >> skip;
+	skipComments(newImage);
+	newImage >> skip;
+	skipComments(newImage);
+	newImage >> inputMaxValueTxt;
+	skipComments(newImage);
 
 	setFormat(inputFormatTxt);
 	setMaxValue(getNumb(inputMaxValueTxt));

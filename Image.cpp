@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include "Image.h"
+#include "Utility.h"
 
 Image::Image()
 {
@@ -16,11 +17,17 @@ Image::Image(const std::string& _file)
 	setFileName(_file);
 	setFormat(_file);
 	
+	std::string skip;
 	std::string inputWidthTxt;
 	std::string inputLengthTxt;
-	std::string skip;
 
-	input >> skip >> inputWidthTxt >> inputLengthTxt;
+	skipComments(input);
+	input >> skip;
+	skipComments(input);
+	input >> inputWidthTxt;
+	skipComments(input);
+	input >> inputLengthTxt;
+	skipComments(input);
 
 	setWidth(getNumb(inputWidthTxt));
 	setLength(getNumb(inputLengthTxt));
@@ -41,6 +48,18 @@ bool Image::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 		return false;
 	}
 	
+}
+bool Image::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY) const
+{
+	unsigned short width = getWidth();
+	unsigned short length = getLength();
+	if (topLeftX < 0) topLeftX = 0;
+	if (topLeftY < 0) topLeftY = 0;
+	if (botRightX >= width)  botRightX = width-1;
+	if (botRightY >= length) botRightY = length-1;	
+
+	if (topLeftX > botRightX || topLeftY > botRightY  )
+		throw std::invalid_argument("Invalid Coordinates. The image didn`t changed!");
 }
 
 void Image::addCommand(ImageProcesing::Commands command)
@@ -70,20 +89,6 @@ void Image::undo()
 	commandsToDo.pop_back();
 }
 
-
-bool Image::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY) const
-{
-	unsigned short width = getWidth();
-	unsigned short length = getLength();
-	if (topLeftX < 0) topLeftX = 0;
-	if (topLeftY < 0) topLeftY = 0;
-	if (botRightX >= width)  botRightX = width-1;
-	if (botRightY >= length) botRightY = length-1;	
-
-	if (topLeftX > botRightX || topLeftY > botRightY  )
-		throw std::invalid_argument("Invalid Coordinates. The image didn`t changed!");
-}
-
 void Image::setFileName(const std::string& _fileName)
 {
 	if (!_fileName.c_str())
@@ -104,6 +109,15 @@ void Image::setFileName(const std::string& _fileName)
 	}
 	fileName = _fileName;
 	fileName.erase(fileName.size() - 4);
+}
+void Image::skipComments(std::ifstream& file) const
+{
+	std::string line;
+	char ch;
+	while (file >> std::ws && file.peek() == '#') 
+	{
+		std::getline(file, line);
+	}
 }
 void Image::setFormat(const std::string& _format)
 {

@@ -14,7 +14,13 @@ PBM::PBM(const std::string& _file) :Image(_file)
 	std::string skip;
 	std::string inputFormatTxt;
 
-	newImage >> inputFormatTxt >> skip >> skip;
+	skipComments(newImage);
+	newImage >> inputFormatTxt;
+	skipComments(newImage);
+	newImage >> skip;
+	skipComments(newImage);
+	newImage >> skip;
+	skipComments(newImage);
 
 	setFormat(inputFormatTxt);
 	setMatrix(newImage);
