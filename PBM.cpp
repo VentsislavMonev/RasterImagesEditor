@@ -92,6 +92,11 @@ bool PBM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 	return true;
 }
 
+void PBM::print() const
+{
+	std::cout << getFileName() << " - 32bit Bitmap" << std::endl;
+}
+
 void PBM::save()
 {
 	if (!getCommandsToDo().empty())
@@ -116,6 +121,25 @@ void PBM::save()
 		newImage.close();
 	}
 	else return;
+}
+
+void PBM::save(const std::string& newName)
+{
+	setFileName(newName);
+	manageCommands();
+
+	//opens file with given name
+	std::ofstream newImage(newName);
+	if (!newImage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short width = getWidth();
+	unsigned short length = getLength();
+
+	writeFileHeader(newImage);
+	writeMatrix(newImage, width, length);
+
+	newImage.close();
 }
 
 
@@ -189,6 +213,13 @@ void PBM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 	}
 }
 
+
+void PBM::setFileName(const std::string& _fileName)
+{
+	Image::setFileName(_fileName);
+	if (_fileName.substr(_fileName.size() - 4) != ".pbm")
+		throw std::invalid_argument("Invalid image type");
+}
 
 void PBM::setMatrix(std::ifstream& newImage)
 {

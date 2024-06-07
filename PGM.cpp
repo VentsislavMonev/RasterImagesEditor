@@ -124,6 +124,11 @@ bool PGM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 	return true;
 }
 
+void PGM::print() const
+{
+	std::cout << getFileName() << " - portable graymap format" << std::endl;
+}
+
 void PGM::save()
 {
 	if (!getCommandsToDo().empty())
@@ -148,6 +153,25 @@ void PGM::save()
 		newImage.close();
 	}
 	else return;
+}
+
+void PGM::save(const std::string& newName)
+{
+	setFileName(newName);
+	manageCommands();
+
+	//opens file with given name
+	std::ofstream newImage(newName);
+	if (!newImage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short width = getWidth();
+	unsigned short length = getLength();
+
+	writeFileHeader(newImage);
+	writeMatrix(newImage, width, length);
+
+	newImage.close();	
 }
 
 
@@ -205,6 +229,13 @@ void PGM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 		}
 		newImage << std::endl;
 	}
+}
+
+void PGM::setFileName(const std::string& _fileName)
+{
+	Image::setFileName(_fileName);
+	if (_fileName.substr(_fileName.size() - 4) != ".pgm")
+		throw std::invalid_argument("Invalid image type");
 }
 
 void PGM::setMatrix(std::ifstream& newImage)

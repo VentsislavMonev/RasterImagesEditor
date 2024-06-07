@@ -70,25 +70,7 @@ void copyPPM(const std::string& inputFilename, const std::string& outputFilename
 
 int main()
 {
-	std::string idontloveyouanymore = "da.ppm";
-	//Session aloda;
-	//aloda.addPPM(idontloveyouanymore);
-	//Session kvostaaAAAAA;
-	//kvostaaAAAAA = aloda;
-	PPM aaaa(idontloveyouanymore);
 	
-	aaaa.addCommand(ImageProcesing::Commands::negative);
-	aaaa.save();
-
-	//gei.addCommand(ImageProcesing::Commands::negative);
-	//gei.addCommand(ImageProcesing::Commands::grayscale);
-	//gei.addCommand(ImageProcesing::Commands::monochrome);
-	//gei.addCommand(ImageProcesing::Commands::rotateRight);
-	//gei.addCommand(ImageProcesing::Commands::rotateLeft);
-	//gei.addCommand(ImageProcesing::Commands::flipTop);
-	//gei.addCommand(ImageProcesing::Commands::flipLeft);
-
-	//gei.save();
 	
 	
 	

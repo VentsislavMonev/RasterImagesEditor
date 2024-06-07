@@ -21,7 +21,9 @@ public:
 
 	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
+	virtual void print()const override;
 	virtual void save() override;
+	virtual void save(const std::string& newName);
 
 public:
 	const std::vector<std::vector<bool>>& getMatrix()const;
@@ -37,9 +39,10 @@ private:
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 
 private:
+	virtual void setFileName(const std::string& _fileName);
+	virtual void setFormat(const std::string& _format) override;
 	void setMatrix(std::ifstream& newImage);
 
-	virtual void setFormat(const std::string& _format) override;
 	bool setValue(int _value);
 
 private:

@@ -27,7 +27,9 @@ public:
 
 	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
+	virtual void print()const override;
 	virtual void save() override;
+	virtual void save(const std::string& newName);
 
 protected:
 	virtual void transposeMatrix() override;
@@ -39,6 +41,7 @@ private:
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 
 private:
+	virtual void setFileName(const std::string& _fileName);
 	void setMatrix(std::ifstream& newImage);
 	void setMaxValue(int _maxValue);
 	virtual void setFormat(const std::string& _format) override;

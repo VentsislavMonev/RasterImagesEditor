@@ -176,6 +176,10 @@ unsigned short Image::getLength() const
 {
 	return length;
 }
+bool Image::isChanged() const
+{
+	return !commandsToDo.empty();
+}
 const std::vector<ImageProcesing::Commands>& Image::getCommandsToDo() const
 {
 	return commandsToDo;
@@ -229,7 +233,6 @@ void Image::manageCommands()
 	manageRotations(rotationsLeft, rotationsRight);
 	manageFlips(flipsTop, flipsLeft);
 }
-
 void Image::manageRotations(int rotationsLeft, int rotationsRight)
 {
 	rotationsLeft = rotationsLeft % 4;

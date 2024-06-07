@@ -42,6 +42,8 @@ public:
 	unsigned short getWidth()const;
 	unsigned short getLength()const;
 
+	bool isChanged()const;
+
 //methods
 public:
 	virtual void grayScale()  = 0;
@@ -59,7 +61,9 @@ public:
 	void redo();
 	void undo();
 
+	virtual void print()const = 0;
 	virtual void save() = 0;
+	virtual void save(const std::string& newName) = 0;
 
 //matrix manipulation functions
 protected:
@@ -68,6 +72,7 @@ protected:
 	virtual void reverseRows()     = 0;
 
 protected:
+	virtual void setFileName(const std::string& _fileName);
 	void setWidth(int _width);
 	void setLength(int _length);
 
@@ -82,7 +87,6 @@ protected:
 //setters
 private:
 	virtual void setFormat(const std::string& _format);
-	void setFileName(const std::string& _fileName);
 	bool validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)const;
 
 	void manageRotations(int rotationsLeft, int rotationsRight);

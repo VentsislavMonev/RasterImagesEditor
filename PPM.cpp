@@ -74,6 +74,13 @@ void PPM::setMaxValue(int _maxValue)
 		maxValue = _maxValue;
 }
 
+void PPM::setFileName(const std::string& _fileName)
+{
+	Image::setFileName(_fileName);
+	if (_fileName.substr(_fileName.size() - 4) != ".ppm")
+		throw std::invalid_argument("Invalid image type");
+}
+
 void PPM::setFormat(const std::string& _format)
 {
 	if (_format != "P3")
@@ -116,6 +123,11 @@ bool PPM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 	return true;
 }
 
+void PPM::print() const
+{
+	std::cout << getFileName() << " - portable pixmap format" << std::endl;
+}
+
 void PPM::save()
 {
 	if (!getCommandsToDo().empty())
@@ -141,6 +153,25 @@ void PPM::save()
 	}
 	else return;
 	
+}
+
+void PPM::save(const std::string& newName)
+{
+	setFileName(newName);
+	manageCommands();
+
+	//opens file with given name
+	std::ofstream newImage(newName);
+	if (!newImage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short width = getWidth();
+	unsigned short length = getLength();
+
+	writeFileHeader(newImage);
+	writeMatrix(newImage, width, length);
+
+	newImage.close();
 }
 
 void PPM::grayScale()

@@ -34,19 +34,53 @@ Session::~Session()
     free();
 }
 
+void Session::addFile(const std::string& fileName)
+{
+    checkIfImageExist(fileName);
+    std::string format = fileName.substr(fileName.size() - 4);
+    if (format == ".ppm")
+        addPPM(fileName);
+    else if (format == ".pgm")
+        addPGM(fileName);
+    else if (format == ".pbm")
+        addPBM(fileName);
+    else std::cout << "\""<< fileName<<"\" " <<"is not supported and wasnt added to the session" << std::endl;
+}
+
 void Session::addPPM(const std::string& image)
 {
-    addImage(new PPM(image));
+    try 
+    {
+        addImage(new PPM(image));
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what();
+    }
 }
 
 void Session::addPGM(const std::string& image)
 {
-    addImage(new PGM(image));
+    try
+    {
+        addImage(new PGM(image));
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what();
+    }
 }
 
 void Session::addPBM(const std::string& image)
 {
-    addImage(new PBM(image));
+    try
+    {
+        addImage(new PBM(image));
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what();
+    }
 }
 
 void Session::addCommand(ImageProcesing::Commands command)
@@ -73,11 +107,37 @@ void Session::redo()
     }
 }
 
-void Session::saveAll()
+void Session::save()
 {
     for (size_t i = 0; i < size; i++)
     {
         images[i]->save();
+    }
+}
+
+void Session::listSession() const
+{
+    std::cout << "Files in session with ID " << id << ":" << std::endl;
+    for (size_t i = 0; i < size; i++)
+    {
+        images[i]->print();
+    }
+}
+
+void Session::exit()
+{
+    std::string answer;
+    if (areChanged())
+    {
+        std::cout << "Session contains unsaved work. Save it now (y/n)?";
+        do
+        {
+            std::cin >> answer;
+        } while (answer != "y" && answer != "yes" && answer != "n" && answer != "no");
+        if (answer == "y" || answer == "yes")
+        {
+            save();
+        }
     }
 }
 
@@ -120,9 +180,31 @@ void Session::resize()
     images = resized;
 }
 
+void Session::checkIfImageExist(const std::string& fileName) const
+{
+    std::string file = fileName.substr(0, fileName.size() - 4);
+    for (size_t i = 0; i < size; i++)
+    {
+        if (images[i]->getFileName() == file)
+        {
+            std::cout << "Image:" << file << " already in session" << std::endl;
+            return;
+        }
+    }
+}
+
+bool Session::areChanged() const
+{
+    for (size_t i = 0; i < size; i++)
+    {
+        if (images[i]->isChanged())
+            return true;
+    }
+    return false;
+}
+
 void Session::addImage(Image* other)
 {
-
     if (size >=  capacity)
         resize();
     images[size++] = other;
