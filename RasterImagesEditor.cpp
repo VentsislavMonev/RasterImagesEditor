@@ -68,10 +68,193 @@ void copyPPM(const std::string& inputFilename, const std::string& outputFilename
 	outputFile.close();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+std::string toLowwer(const std::string& string)
+{
+	std::string result = string;
+	size_t size = string.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		if (result[i] >= 'A' && result[i] <= 'Z')
+			result[i] += 'a' - 'A';
+	}
+	return result;
+}
+
+void splitInputs(const std::string& input, std::vector<std::string>& inputs)
+{
+	inputs.clear();
+	std::string currentStr = "";
+	size_t inputSize = input.size();
+	for (size_t i = 0; i < inputSize; i++)
+	{
+		if (input[i] == ' ')
+		{
+			if (currentStr == "") continue;
+			inputs.push_back(currentStr);
+			currentStr = "";
+		}
+		else
+		{
+			currentStr += input[i];
+		}
+	}
+
+	if (currentStr != "") inputs.push_back(currentStr);
+}
+
+
+void verifyInputs(const std::vector<std::string>& inputs,ImageProcesing::Commands& command)
+{
+	if (inputs.size() == 1)
+	{
+		std::string commandTxt = toLowwer(inputs[0]);
+
+		if (commandTxt == "grayscale")		command = ImageProcesing::Commands::grayscale;
+		else if (commandTxt == "monochrome")	command = ImageProcesing::Commands::monochrome;
+		else if (commandTxt == "negative")		command = ImageProcesing::Commands::negative;
+		else command = ImageProcesing::Commands::defaultCommand;
+	}
+	else if (inputs.size() == 2)
+	{
+		std::string fisrtCommandTxt = toLowwer(inputs[0]);
+		std::string secondCommandTxt = toLowwer(inputs[1]);
+
+		if (fisrtCommandTxt == "rotate" && secondCommandTxt == "left")
+			command = ImageProcesing::Commands::rotateLeft;
+		else if (fisrtCommandTxt == "rotate" && secondCommandTxt == "right")
+			command = ImageProcesing::Commands::rotateRight;
+		else if (fisrtCommandTxt == "flip" && secondCommandTxt == "top")
+			command = ImageProcesing::Commands::flipTop;
+		else if (fisrtCommandTxt == "flip" && secondCommandTxt == "left")
+			command = ImageProcesing::Commands::flipLeft;
+		else command = ImageProcesing::Commands::defaultCommand;
+	}
+	else command = ImageProcesing::Commands::defaultCommand;
+	
+}
+
+void manageSessionCommand(const std::vector<std::string>& inputs, Session& session)
+{
+	if (inputs.size() == 1)
+	{
+		std::string firstCommandTxt = toLowwer(inputs[0]);
+
+		if (firstCommandTxt == "save")	    session.save();
+		//else if (commandTxt == "load")			command = ImageProcesing::Commands::load;
+		else if (firstCommandTxt == "undo") session.undo();
+		else if (firstCommandTxt == "redo") session.redo();
+		else if (firstCommandTxt == "exit") session.exit();
+	}
+	if (inputs.size() >= 1)
+	{
+		std::string firstCommandTxt = toLowwer(inputs[0]);
+
+		if (firstCommandTxt == "saveas")
+		{
+			session.saveas(inputs);
+		}
+		else if (firstCommandTxt == "add")
+		{
+			for (size_t i = 1; i < inputs.size(); ++i)
+			{
+				session.addFile(inputs[i]);
+			}
+		}
+	}
+	if (inputs.size() == 2)
+	{
+		std::string firstCommandTxt = toLowwer(inputs[0]);
+		std::string seccondCommandTxt = toLowwer(inputs[1]);
+
+		if (firstCommandTxt == "list" && seccondCommandTxt == "session")
+			session.listSession();
+	}
+	if (inputs.size() == 5)
+	{
+		std::string firstCommandTxt = toLowwer(inputs[0]);
+		std::string seccondCommandTxt = toLowwer(inputs[1]);
+		std::string thirdCommandTxt = toLowwer(inputs[2]);
+
+		if (firstCommandTxt == "make" && seccondCommandTxt == "collage" && thirdCommandTxt == "horizontal")
+			session.makeHorizontalCollage(inputs[3],inputs[4]);
+		else if (firstCommandTxt == "make" && seccondCommandTxt == "collage" && thirdCommandTxt == "vertical")
+			session.makeVerticalCollage(inputs[3], inputs[4]);
+		else if (firstCommandTxt == "crop")
+			session.crop(inputs[1], inputs[2], inputs[3], inputs[4]);
+	}
+	
+}
+
 int main()
 {
-	
-	
+
+	std::vector<Session> sessions;
+	std::string firstInput;
+	std::vector<std::string> inputs;
+	SessionProcesing::commands command;
+	ImageProcesing::Commands imageCommand;
+
+	//loads the session
+	do
+	{
+		std::getline(std::cin, firstInput);
+		splitInputs(firstInput, inputs);
+	} while (inputs.empty() || inputs[0] != "load");
+
+	Session session;
+	for (size_t i = 1; i < inputs.size(); i++)
+	{
+		session.addFile(inputs[i]);
+	}
+
+	//manages picture commands
+	do
+	{
+		std::getline(std::cin, firstInput);
+		splitInputs(firstInput, inputs);
+		verifyInputs(inputs, imageCommand);
+		if (imageCommand != ImageProcesing::Commands::defaultCommand)
+		{
+			try
+			{
+				session.addCommand(imageCommand);
+			}
+			catch (const std::exception& e)
+			{
+				std::cout << e.what()<<std::endl;
+			}
+		}
+		else
+		{
+			try
+			{
+				manageSessionCommand(inputs, session);
+			}
+			catch (const std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+		}
+	} while (inputs.empty() || inputs[0] != "exit");
+
+
+
 	
 	
 	

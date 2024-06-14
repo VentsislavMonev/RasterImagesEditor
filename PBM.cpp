@@ -66,7 +66,7 @@ void PBM::flipLeft()
 	reverseColumns();
 }
 
-bool PBM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+bool PBM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 {
 	//validates //validates the coordinates
 	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
@@ -125,6 +125,8 @@ void PBM::save()
 
 void PBM::save(const std::string& newName)
 {
+	if (fileExist(newName))
+		throw std::invalid_argument("File with name: " + newName + " already exist");
 	setFileName(newName);
 	manageCommands();
 
@@ -216,9 +218,9 @@ void PBM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 
 void PBM::setFileName(const std::string& _fileName)
 {
+	if (_fileName.size() > 4 && _fileName.substr(_fileName.size() - 4) != ".pbm")
+		throw std::invalid_argument("Invalid image");
 	Image::setFileName(_fileName);
-	if (_fileName.substr(_fileName.size() - 4) != ".pbm")
-		throw std::invalid_argument("Invalid image type");
 }
 
 void PBM::setMatrix(std::ifstream& newImage)

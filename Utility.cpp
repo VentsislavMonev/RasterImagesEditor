@@ -1,5 +1,13 @@
 #include "Utility.h"
 
+bool fileExist(const std::string& name)
+{
+	std::ifstream file(name);
+	bool result = file.good();
+	file.close();
+	return result;
+}
+
 int getNumb(const std::string& str)
 {
 	size_t i = 0;

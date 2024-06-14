@@ -76,9 +76,10 @@ void PPM::setMaxValue(int _maxValue)
 
 void PPM::setFileName(const std::string& _fileName)
 {
+	
+	if (_fileName.size()>4 && _fileName.substr(_fileName.size() - 4) != ".ppm")
+		throw std::invalid_argument("Invalid image");
 	Image::setFileName(_fileName);
-	if (_fileName.substr(_fileName.size() - 4) != ".ppm")
-		throw std::invalid_argument("Invalid image type");
 }
 
 void PPM::setFormat(const std::string& _format)
@@ -97,7 +98,7 @@ unsigned char PPM::getMaxValue() const
 	return maxValue;
 }
 
-bool PPM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+bool PPM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 {
 	//validates the coordinates
 	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
@@ -157,6 +158,8 @@ void PPM::save()
 
 void PPM::save(const std::string& newName)
 {
+	if (fileExist(newName))
+		throw std::invalid_argument("File with name: " + newName + " already exist");
 	setFileName(newName);
 	manageCommands();
 

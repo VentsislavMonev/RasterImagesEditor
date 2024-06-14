@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+const short sides = 4;
+
 namespace ImageProcesing
 {
 	enum class ImageType
@@ -39,6 +41,7 @@ public:
 public:
 	const std::string& getFileName()const;
 	ImageProcesing::ImageType getFormat()const;
+	ImageProcesing::ImageType getFormat(const std::string& _format)const;
 	unsigned short getWidth()const;
 	unsigned short getLength()const;
 
@@ -55,7 +58,7 @@ public:
 	virtual void flipTop()	  = 0;
 	virtual void flipLeft()   = 0;
  
-    virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
+    virtual bool crop(int& topLeftX, int& topLeftY, int& botRightX, int& botLeftY) = 0;
 
 	void addCommand(ImageProcesing::Commands command);
 	void redo();

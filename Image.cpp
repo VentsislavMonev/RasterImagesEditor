@@ -33,21 +33,24 @@ Image::Image(const std::string& _file)
 	setLength(getNumb(inputLengthTxt));
 }
 
-bool Image::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
+bool Image::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 {
 	try
 	{
 		validateCoordinates(topLeftX, topLeftY, botRightX, botRightY);
-		setWidth(botRightX - topLeftX);
-		setLength(botRightY - topLeftY);
+		setWidth(botRightX - topLeftX+1);
+		setLength(botRightY - topLeftY+1);
+
+		//i do this so image can save after crop and remove the undo option
+		manageCommands();
+		commandsToDo.push_back(ImageProcesing::Commands::crop);
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << e.what();
+		std::cout << e.what() << std::endl;
 		return false;
-	}
-	
+	}	
 }
 bool Image::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY) const
 {
@@ -59,7 +62,7 @@ bool Image::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, in
 	if (botRightY >= length) botRightY = length-1;	
 
 	if (topLeftX > botRightX || topLeftY > botRightY  )
-		throw std::invalid_argument("Invalid Coordinates. The image didn`t changed!");
+		throw std::invalid_argument("Invalid Coordinates. The image" + fileName +" didn`t changed!");
 }
 
 void Image::addCommand(ImageProcesing::Commands command)
@@ -85,6 +88,7 @@ void Image::undo()
 	if (commandsToDo.empty())
 		return;
 	ImageProcesing::Commands command = commandsToDo.back();
+	if (command == ImageProcesing::Commands::crop) return;
 	commandsToNotDo.push_back(command);
 	commandsToDo.pop_back();
 }
@@ -100,9 +104,10 @@ void Image::setFileName(const std::string& _fileName)
 	for (size_t i = 0; i < fileNameSize; ++i)
 	{
 		if ((_fileName[i] < 'A' || _fileName[i] > 'Z') &&
-			(_fileName[i] < 'a' || _fileName[i]> 'z') &&
-			(_fileName[i] < '0' || _fileName[i] >'9')&&
-			_fileName[i] !='.'&& _fileName[i] != '_')
+			(_fileName[i] < 'a' || _fileName[i]> 'z')  &&
+			(_fileName[i] < '0' || _fileName[i] >'9')  &&
+			_fileName[i] != '.' && _fileName[i] != '_' &&
+			_fileName[i] != '(' && _fileName[i] != ')')
 		{
 			throw std::invalid_argument("Inavalid file name!");
 		}
@@ -168,6 +173,12 @@ ImageProcesing::ImageType Image::getFormat() const
 {
 	return format;
 }
+ImageProcesing::ImageType Image::getFormat(const std::string& _format) const
+{
+	if (_format == ".ppm") return ImageProcesing::ImageType::P3;
+	else if (_format == ".pgm") return ImageProcesing::ImageType::P2;
+	else if (_format == ".pbm") return ImageProcesing::ImageType::P1;
+}
 unsigned short Image::getWidth() const
 {
 	return width;
@@ -199,10 +210,10 @@ void Image::manageCommands()
 	bool isGrayscale = false;
 
 	//manages commands
-	size_t commandsCount = getCommandsToDo().size();
+	size_t commandsCount = commandsToDo.size();
 	for (size_t i = 0; i < commandsCount; ++i)
 	{
-		switch (getCommandsToDo()[i])
+		switch (commandsToDo[i])
 		{
 		case ImageProcesing::Commands::monochrome:
 			if (!isMonochrome)
@@ -223,23 +234,25 @@ void Image::manageCommands()
 		case ImageProcesing::Commands::rotateRight: ++rotationsRight; break;
 		case ImageProcesing::Commands::flipTop:		++flipsTop;		  break;
 		case ImageProcesing::Commands::flipLeft:	++flipsLeft;	  break;
+		case ImageProcesing::Commands::crop:						  break;
 
 		case ImageProcesing::Commands::defaultCommand:
 			throw std::runtime_error("Invalid command");
 			break;
 		}
 	}
+	commandsToDo.clear();
 
 	manageRotations(rotationsLeft, rotationsRight);
 	manageFlips(flipsTop, flipsLeft);
 }
 void Image::manageRotations(int rotationsLeft, int rotationsRight)
 {
-	rotationsLeft = rotationsLeft % 4;
-	rotationsRight = rotationsRight % 4;
-	if (rotationsLeft <= rotationsRight)
+	rotationsLeft = rotationsLeft % sides;
+	rotationsRight = rotationsRight % sides;
+	if ( rotationsLeft>=rotationsRight)
 	{
-		for (size_t i = 0; i < rotationsLeft; i++)
+		for (size_t i = 0; i < rotationsLeft-rotationsRight; i++)
 		{
 			rotateLeft();
 		}
