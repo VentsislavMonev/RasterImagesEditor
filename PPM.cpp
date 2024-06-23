@@ -76,9 +76,8 @@ void PPM::setMaxValue(int _maxValue)
 
 void PPM::setFileName(const std::string& _fileName)
 {
-	
 	if (_fileName.size()>4 && _fileName.substr(_fileName.size() - 4) != ".ppm")
-		throw std::invalid_argument("Invalid image");
+		throw std::invalid_argument("Invalid file name!");
 	Image::setFileName(_fileName);
 }
 
@@ -153,7 +152,6 @@ void PPM::save()
 		newImage.close();
 	}
 	else return;
-	
 }
 
 void PPM::save(const std::string& newName)
@@ -182,12 +180,8 @@ void PPM::grayScale()
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
 	for (size_t i = 0; i < length; ++i)
-	{
 		for (size_t j = 0; j < width; ++j)
-		{
 			pixels[i][j].setEqual(pixels[i][j].getGrayScaleValue());
-		}
-	}
 }
 
 void PPM::monochrome()
@@ -276,9 +270,8 @@ void PPM::reverseColumns()
 void PPM::reverseRows()
 {
 	unsigned short columnsCount = getLength();
-	for (size_t i = 0; i < columnsCount /2; ++i)
-			std::swap(pixels[i], pixels[columnsCount -1-i]);
-
+	for (size_t i = 0; i < columnsCount / 2; ++i)
+		std::swap(pixels[i], pixels[columnsCount - 1 - i]);
 }
 
 void PPM::writeFileHeader(std::ofstream& newImage) const
@@ -299,9 +292,10 @@ void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 	{
 		for (size_t j = 0; j < _width; ++j)
 		{
-			newImage << static_cast<unsigned>(pixels[i][j].r()) << ' ' 
-					 << static_cast<unsigned>(pixels[i][j].g()) << ' ' 
-					 << static_cast<unsigned>(pixels[i][j].b()) << std::endl;
+			newImage << static_cast<unsigned>(pixels[i][j].r()) << ' '
+					 << static_cast<unsigned>(pixels[i][j].g()) << ' '
+					 << static_cast<unsigned>(pixels[i][j].b()) << ' ';
 		}
+		newImage << std::endl;
 	}
 }

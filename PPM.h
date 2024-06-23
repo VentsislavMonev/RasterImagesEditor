@@ -42,7 +42,7 @@ protected:
 
 	//setters
 private:
-	virtual void setFileName(const std::string& _fileName);
+	virtual void setFileName(const std::string& _fileName) override;
 	virtual void setFormat(const std::string& _format) override ;
 	void setMatrix(std::ifstream& newImage);
 	void setMaxValue(int _maxValue);
@@ -52,8 +52,8 @@ private:
 	void writeFileHeader(std::ofstream& newImage)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 
+	//members
 private:
 	std::vector<std::vector<RGB>> pixels;
-	unsigned char maxValue;
+	unsigned char maxValue = 0;
 };
-

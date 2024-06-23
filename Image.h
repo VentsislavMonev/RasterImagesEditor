@@ -27,7 +27,6 @@ namespace ImageProcesing
 		defaultCommand
 	};
 }
-
 class Image
 {
 public:
@@ -42,6 +41,7 @@ public:
 	const std::string& getFileName()const;
 	ImageProcesing::ImageType getFormat()const;
 	ImageProcesing::ImageType getFormat(const std::string& _format)const;
+	std::string getFileTypeStr()const;
 	unsigned short getWidth()const;
 	unsigned short getLength()const;
 
@@ -91,6 +91,8 @@ protected:
 private:
 	virtual void setFormat(const std::string& _format);
 	bool validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)const;
+	
+	bool validateName(const std::string& name)const;
 
 	void manageRotations(int rotationsLeft, int rotationsRight);
 	void manageFlips(int flipsTop, int flipsLeft);

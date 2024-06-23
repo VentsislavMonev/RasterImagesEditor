@@ -11,10 +11,12 @@ public:
 
 	virtual Image* clone() const override;
 
+	//getters
 public:
 	const std::vector<std::vector<unsigned char>>& getMatrix()const;
 	unsigned char getMaxValue()const;
 
+	//functions
 public:
 	virtual void monochrome() override;
 	virtual void grayScale() override {}
@@ -31,15 +33,14 @@ public:
 	virtual void save() override;
 	virtual void save(const std::string& newName);
 
+	//helper protected functions 
 protected:
 	virtual void transposeMatrix() override;
 	virtual void reverseColumns()   override;
 	virtual void reverseRows()      override;
 
-private:
-	void writeFileHeader(std::ofstream& newImage)const;
-	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
 
+	//setters
 private:
 	virtual void setFileName(const std::string& _fileName);
 	void setMatrix(std::ifstream& newImage);
@@ -47,6 +48,12 @@ private:
 	virtual void setFormat(const std::string& _format) override;
 	unsigned char setValue(int _value);
 
+	//helper private functions
+private:
+	void writeFileHeader(std::ofstream& newImage)const;
+	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
+
+	//members
 private:
 	std::vector<std::vector<unsigned char>> pixels;
 	unsigned char maxValue;

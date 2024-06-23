@@ -39,12 +39,8 @@ void PBM::negative()
 	unsigned short width = getWidth();
 	unsigned short length = getLength();
 	for (size_t i = 0; i < length; i++)
-	{
 		for (size_t j = 0; j < width; j++)
-		{
 			pixels[i][j] = maxValue - pixels[i][j];
-		}
-	}
 }
 
 void PBM::rotateLeft()
@@ -219,7 +215,7 @@ void PBM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 void PBM::setFileName(const std::string& _fileName)
 {
 	if (_fileName.size() > 4 && _fileName.substr(_fileName.size() - 4) != ".pbm")
-		throw std::invalid_argument("Invalid image");
+		throw std::invalid_argument("Invalid file name!");
 	Image::setFileName(_fileName);
 }
 

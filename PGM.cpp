@@ -69,12 +69,8 @@ void PGM::negative()
 	unsigned short length = getLength();
 	unsigned short value = 0;
 	for (size_t i = 0; i < length; ++i)
-	{
 		for (size_t j = 0; j < width; ++j)
-		{
 			pixels[i][j] = maxValue - pixels[i][j];
-		}
-	}
 }
 
 void PGM::rotateLeft()
@@ -236,7 +232,7 @@ void PGM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 void PGM::setFileName(const std::string& _fileName)
 {
 	if (_fileName.size() > 4 && _fileName.substr(_fileName.size() - 4) != ".pgm")
-		throw std::invalid_argument("Invalid image");
+		throw std::invalid_argument("Invalid file name!");
 	Image::setFileName(_fileName);
 }
 

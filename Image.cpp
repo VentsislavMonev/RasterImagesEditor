@@ -37,11 +37,12 @@ bool Image::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 {
 	try
 	{
-		validateCoordinates(topLeftX, topLeftY, botRightX, botRightY);
+		if(!validateCoordinates(topLeftX, topLeftY, botRightX, botRightY))
+			throw std::invalid_argument("Invalid Coordinates. The image" + fileName + " didn`t changed!");
 		setWidth(botRightX - topLeftX+1);
 		setLength(botRightY - topLeftY+1);
 
-		//i do this so image can save after crop and remove the undo option
+		//i do this so image can manage commands after crop and add the commandandsToDo vector
 		manageCommands();
 		commandsToDo.push_back(ImageProcesing::Commands::crop);
 		return true;
@@ -61,9 +62,37 @@ bool Image::validateCoordinates(int& topLeftX, int& topLeftY, int& botRightX, in
 	if (botRightX >= width)  botRightX = width-1;
 	if (botRightY >= length) botRightY = length-1;	
 
-	if (topLeftX > botRightX || topLeftY > botRightY  )
-		throw std::invalid_argument("Invalid Coordinates. The image" + fileName +" didn`t changed!");
+	if (topLeftX > botRightX || topLeftY > botRightY)
+		return false;
+	return true;
 }
+
+bool Image::validateName(const std::string& name) const
+{
+	if (!name.c_str())
+	{
+		return false;
+	}
+
+	if (name.size() >= 4)
+	{
+		size_t nameSize = name.size() - 4;
+		for (size_t i = 0; i < nameSize; ++i)
+		{
+			if ((name[i] < 'A' || name[i] > 'Z') &&
+				(name[i] < 'a' || name[i]> 'z') &&
+				(name[i] < '0' || name[i] >'9') &&
+				name[i] != '.' && name[i] != '_' &&
+				name[i] != '(' && name[i] != ')')
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	else return false;
+}
+
 
 void Image::addCommand(ImageProcesing::Commands command)
 {
@@ -95,23 +124,8 @@ void Image::undo()
 
 void Image::setFileName(const std::string& _fileName)
 {
-	if (!_fileName.c_str())
-	{
+	if(!validateName(_fileName))
 		throw std::invalid_argument("Invalid file name!");
-	}
-
-	size_t fileNameSize = _fileName.size()-4;
-	for (size_t i = 0; i < fileNameSize; ++i)
-	{
-		if ((_fileName[i] < 'A' || _fileName[i] > 'Z') &&
-			(_fileName[i] < 'a' || _fileName[i]> 'z')  &&
-			(_fileName[i] < '0' || _fileName[i] >'9')  &&
-			_fileName[i] != '.' && _fileName[i] != '_' &&
-			_fileName[i] != '(' && _fileName[i] != ')')
-		{
-			throw std::invalid_argument("Inavalid file name!");
-		}
-	}
 	fileName = _fileName;
 	fileName.erase(fileName.size() - 4);
 }
@@ -162,7 +176,20 @@ void Image::getModifiedFile(std::string& _modifiedFile) const
 	_modifiedFile = fileName + '_' + modifiedTime;
 
 	//adds the file type to it
-	_modifiedFile.append(".ppm");
+	switch (format)
+	{
+	case ImageProcesing::ImageType::P1:
+		_modifiedFile.append(".pbm");
+		break;
+	case ImageProcesing::ImageType::P2:
+		_modifiedFile.append(".pgm");
+		break;
+	case ImageProcesing::ImageType::P3:
+		_modifiedFile.append(".ppm");
+		break;
+	case ImageProcesing::ImageType::defaultType:
+		throw std::invalid_argument("Image is bad. Image couldn`t save!");
+	}
 }
 
 const std::string& Image::getFileName() const
@@ -172,6 +199,26 @@ const std::string& Image::getFileName() const
 ImageProcesing::ImageType Image::getFormat() const
 {
 	return format;
+}
+std::string Image::getFileTypeStr() const
+{
+	std::string result;
+	switch (format)
+	{
+	case ImageProcesing::ImageType::P1:
+		result = ".pbm";
+		break;
+	case ImageProcesing::ImageType::P2:
+		result = ".pgm";
+		break;
+	case ImageProcesing::ImageType::P3:
+		result = ".ppm";
+		break;
+	case ImageProcesing::ImageType::defaultType:
+		throw std::runtime_error("Something went wrong with image " + fileName + " format!");
+		break;
+	}
+	return result;
 }
 ImageProcesing::ImageType Image::getFormat(const std::string& _format) const
 {
@@ -251,19 +298,11 @@ void Image::manageRotations(int rotationsLeft, int rotationsRight)
 	rotationsLeft = rotationsLeft % sides;
 	rotationsRight = rotationsRight % sides;
 	if ( rotationsLeft>=rotationsRight)
-	{
 		for (size_t i = 0; i < rotationsLeft-rotationsRight; i++)
-		{
 			rotateLeft();
-		}
-	}
 	else
-	{
 		for (size_t i = 0; i < rotationsRight; i++)
-		{
 			rotateRight();
-		}
-	}
 }
 void Image::manageFlips(int flipsTop, int flipsLeft)
 {

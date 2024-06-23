@@ -10,5 +10,8 @@ int  getNumb(const std::string& str);
 
 std::string getString(int numb);
 
-//gets the current time and transfers it to string
+//gets the current date and time and transfers it to string
 std::string getModifiedTime();
+
+unsigned getCurrentTime();
+

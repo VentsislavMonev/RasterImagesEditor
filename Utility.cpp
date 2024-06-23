@@ -57,3 +57,11 @@ std::string getModifiedTime()
 		getString(date.tm_hour) + getString(date.tm_min) + getString(date.tm_sec);
 	return modifiedTime;
 }
+
+unsigned getCurrentTime()
+{
+	time_t time = std::time(0);
+	tm date;
+	localtime_s(&date, &time);
+	return ((date.tm_hour + 1) * 10'000 + (date.tm_min + 1) * 100 + date.tm_sec + 1);
+}
