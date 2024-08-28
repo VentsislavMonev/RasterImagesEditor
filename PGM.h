@@ -27,7 +27,7 @@ public:
 	virtual void flipTop() override;
 	virtual void flipLeft() override;
 
-	virtual bool crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)override;
+	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
 	virtual void print()const override;
 	virtual void save() override;

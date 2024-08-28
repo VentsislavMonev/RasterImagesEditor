@@ -47,7 +47,7 @@ private:
 	void writeCollageHeader(unsigned short newWidth, unsigned short newLength, const Image& image1, const Image& image2, std::ofstream& newImage)const;
 	void checkIfImagesForCollageInSession(const std::string& firstImage, const std::string& secondImage)const;
 
-	//priate helper functions
+	//private helper functions
 private:
 	void addPPM(const std::string& image);
 	void addPGM(const std::string& image);
@@ -61,6 +61,7 @@ private:
 private:
 	void setID();
 
+// TODO otdelen klas za Image** images
 	//members
 private:	
 	Image** images;

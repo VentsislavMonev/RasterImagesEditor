@@ -304,7 +304,16 @@ void Session::crop(const std::string& topLeftX, const std::string& topLeftY, con
     int botRX = getNumb(botRightX);
     int botRY = getNumb(botRightY);
     for (size_t i = 0; i < size; ++i)
-        images[i]->crop(topLX, topLY, botRX, botRY);
+    {
+        try
+        {
+            images[i]->crop(topLX, topLY, botRX, botRY);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what()<<std::endl;
+        }
+    }
 }
 
 void Session::undo()
@@ -722,5 +731,6 @@ void Session::addImage(Image* other)
 {
     if (size >=  capacity)
         resize();
-    images[size++] = other;
+    images[size] = other;
+    ++size;
 }

@@ -21,7 +21,7 @@ public:
 	virtual void flipTop() override;
 	virtual void flipLeft() override;
 
-	virtual bool crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)override;
+	virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botRightY)override;
 
 	virtual void print()const override;
 	virtual void save() override;
@@ -53,6 +53,10 @@ private:
 
 	//members
 private:
+	//vector ot bool mnogo zle !
+	//	std::vector<bool> vec;
+	//	bool& boolean = vec[0];
+
 	std::vector<std::vector<bool>> pixels;
 	static const bool maxValue = 1;
 };

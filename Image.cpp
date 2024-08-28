@@ -33,16 +33,11 @@ Image::Image(const std::string& _file)
 	setLength(getNumb(inputLengthTxt));
 }
 
-bool Image::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
+bool Image::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 {
 	try
 	{
-		if(!validateCoordinates(topLeftX, topLeftY, botRightX, botRightY))
-			throw std::invalid_argument("Invalid Coordinates. The image" + fileName + " didn`t changed!");
-		setWidth(botRightX - topLeftX+1);
-		setLength(botRightY - topLeftY+1);
-
-		//i do this so image can manage commands after crop and add the commandandsToDo vector
+		//i do this so image can manage commands after crop and add crop to the commandandsToDo vector
 		manageCommands();
 		commandsToDo.push_back(ImageProcesing::Commands::crop);
 		return true;
@@ -148,6 +143,14 @@ void Image::setFormat(const std::string& _format)
 	else if (inputFormat == ".pbm")
 		format = ImageProcesing::ImageType::P1;
 	else throw std::invalid_argument("Invalid image type");
+}
+bool Image::manageCrop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
+{
+	if (!validateCoordinates(topLeftX, topLeftY, botRightX, botRightY))
+		throw std::invalid_argument("Invalid Coordinates. The image " + fileName + " didn`t changed!");
+	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
+		return false;
+	return true;
 }
 void Image::setWidth(int _width)
 {

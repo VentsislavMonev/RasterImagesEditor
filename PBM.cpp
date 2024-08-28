@@ -62,14 +62,14 @@ void PBM::flipLeft()
 	reverseColumns();
 }
 
-bool PBM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
+bool PBM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 {
-	//validates //validates the coordinates
-	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
+	//validates the coordinates
+	if (!Image::manageCrop(topLeftX, topLeftY, botRightX, botRightY))
 		return false;
 
-	unsigned short newWidth = getWidth();
-	unsigned short newLength = getLength();
+	unsigned short newWidth = botRightX - topLeftX + 1;
+	unsigned short newLength = botRightY - topLeftY + 1;
 
 	std::vector<std::vector<bool>> newMatrix;
 	std::vector<bool> row;
@@ -83,8 +83,11 @@ bool PBM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 		newMatrix.push_back(row);
 		row.clear();
 	}
-
 	pixels = newMatrix;
+
+	setWidth(newWidth);
+	setLength(newLength);
+
 	return true;
 }
 
@@ -93,6 +96,7 @@ void PBM::print() const
 	std::cout << getFileName() << " - 32bit Bitmap" << std::endl;
 }
 
+// TODO get width get length da staa v write file header i v write Matrix
 void PBM::save()
 {
 	if (!getCommandsToDo().empty())
@@ -116,7 +120,6 @@ void PBM::save()
 
 		newImage.close();
 	}
-	else return;
 }
 
 void PBM::save(const std::string& newName)

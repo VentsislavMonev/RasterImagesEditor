@@ -94,14 +94,14 @@ void PGM::flipLeft()
 	reverseColumns();
 }
 
-bool PGM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
+bool PGM::crop(int topLeftX, int topLeftY, int botRightX, int botRightY)
 {
 	//validates the coordinates
-	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
+	if (!Image::manageCrop(topLeftX, topLeftY, botRightX, botRightY))
 		return false;
 
-	unsigned short newWidth = getWidth();
-	unsigned short newLength = getLength();
+	unsigned short newWidth = botRightX - topLeftX + 1;
+	unsigned short newLength = botRightY - topLeftY + 1;
 
 	std::vector<std::vector<unsigned char>> newMatrix;
 	std::vector<unsigned char> row;
@@ -115,8 +115,11 @@ bool PGM::crop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY)
 		newMatrix.push_back(row);
 		row.clear();
 	}
-
 	pixels = newMatrix;
+
+	setWidth(newWidth);
+	setLength(newLength);
+
 	return true;
 }
 

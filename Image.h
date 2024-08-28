@@ -58,7 +58,7 @@ public:
 	virtual void flipTop()	  = 0;
 	virtual void flipLeft()   = 0;
  
-    virtual bool crop(int& topLeftX, int& topLeftY, int& botRightX, int& botLeftY) = 0;
+    virtual bool crop(int topLeftX, int topLeftY, int botRightX, int botLeftY) = 0;
 
 	void addCommand(ImageProcesing::Commands command);
 	void redo();
@@ -78,6 +78,7 @@ protected:
 	virtual void setFileName(const std::string& _fileName);
 	void setWidth(int _width);
 	void setLength(int _length);
+	bool manageCrop(int& topLeftX, int& topLeftY, int& botRightX, int& botRightY);
 
 	const std::vector<ImageProcesing::Commands>& getCommandsToDo()const;
 	const std::vector<ImageProcesing::Commands>& getCommandsToNotDo()const;
