@@ -1,5 +1,6 @@
 #pragma once
 #include "Image.h"
+#include "PPM.h"
 
 class PBM:public Image
 {
@@ -27,6 +28,9 @@ public:
 	virtual void save() override;
 	virtual void save(const std::string& newName);
 
+	virtual void makeHorizontalCollage(const Image* other)	const override;
+	virtual void makeVerticalCollage(const Image* other)	const override;
+
 	//getters
 public:
 	const std::vector<std::vector<bool>>& getMatrix()const;
@@ -45,6 +49,9 @@ private:
 	void setMatrix(std::ifstream& newImage);
 
 	bool setValue(int _value);
+
+	void writeCollageHorizontalMatrix(unsigned short newWidth, unsigned short newLength, const PBM* other, std::ofstream& collage)const;
+	void writeCollageVerticalMatrix(unsigned short newWidth, unsigned short newLength, const PBM* other, std::ofstream& collage)const;
 
 	//helper private functions
 private:

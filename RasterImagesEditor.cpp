@@ -45,7 +45,7 @@ void startNewSession(const std::vector<std::string> inputs, std::vector<Session>
 	sessions.push_back(session);
 }
 
-bool manageInputss(const std::vector<std::string>& inputs, std::vector<Session>& sessions)
+bool manageInputsWithDynamicParameters(const std::vector<std::string>& inputs, std::vector<Session>& sessions)
 {
 	if (!inputs.empty())
 	{
@@ -69,7 +69,7 @@ bool manageInputss(const std::vector<std::string>& inputs, std::vector<Session>&
 	return true;
 }
 
-bool manageInputs(const std::vector<std::string>& inputs, std::vector<Session>& sessions)
+bool manageInputsWithFixedParameters(const std::vector<std::string>& inputs, std::vector<Session>& sessions)
 {
 	if (inputs.size() == 1)
 	{
@@ -144,7 +144,7 @@ void manageCommands(std::string& input, std::vector<std::string>& inputs, std::v
 		splitInputs(input, inputs);
 		try
 		{
-			if (!manageInputss(inputs, sessions) && !manageInputs(inputs, sessions))
+			if (!manageInputsWithDynamicParameters(inputs, sessions) && !manageInputsWithFixedParameters(inputs, sessions))
 				std::cout << "Not a valid command!" << std::endl;
 		}
 		catch (const std::exception& e)

@@ -33,12 +33,17 @@ public:
 	virtual void save() override;
 	virtual void save(const std::string& newName);
 
+	virtual void makeHorizontalCollage(const Image* other)	const override;
+	virtual void makeVerticalCollage(const Image* other)	const override;
+
 	//helper protected functions 
 protected:
 	virtual void transposeMatrix() override;
 	virtual void reverseColumns()   override;
 	virtual void reverseRows()      override;
 
+	void writeCollageHorizontalMatrix(unsigned short newWidth, unsigned short newLength, const PGM* other, std::ofstream& collage)const;
+	void writeCollageVerticalMatrix(unsigned short newWidth, unsigned short newLength, const PGM* other, std::ofstream& collage)const;
 
 	//setters
 private:

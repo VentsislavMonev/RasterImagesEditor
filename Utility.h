@@ -14,4 +14,3 @@ std::string getString(int numb);
 std::string getModifiedTime();
 
 unsigned getCurrentTime();
-

@@ -81,8 +81,10 @@ namespace CollageFunctions
         unsigned short difference2 = (newLength - image2.getLength()) / 2;
 
         int x2 = 0;
-        for (int y = 0; y < newLength; ++y) {
-            for (int x = 0; x < newWidth; ++x) {
+        for (int y = 0; y < newLength; ++y) 
+        {
+            for (int x = 0; x < newWidth; ++x) 
+            {
                 if (x < image1.getWidth())
                 {
                     // writing pixels from the first image
@@ -366,12 +368,13 @@ void Session::listSession() const
     }
 }
 
-
 void Session::makeHorizontalCollage(const std::string& firstImage, const std::string& secondImage)
 {
+    int index1 = -1;
+    int index2 = -1;
     try
     {
-        checkIfImagesForCollageInSession(firstImage, secondImage);
+        checkIfImagesForCollageInSession(index1, index2, firstImage, secondImage);
     }
     catch (const std::exception& e)
     {
@@ -379,106 +382,18 @@ void Session::makeHorizontalCollage(const std::string& firstImage, const std::st
         std::cout << "A collage wasn`t made!" << std::endl;
         return;
     }
-
-    std::string format = firstImage.substr(firstImage.size() - 4);
-    if (format == ".ppm")
-        makeHorizontalCollagePPM(firstImage, secondImage);
-    else if (format == ".pgm")
-        makeHorizontalCollagePGM(firstImage, secondImage);
-    else if (format == ".pbm")
-        makeHorizontalCollagePBM(firstImage, secondImage);
     
-}
-
-
-void Session::makeHorizontalCollagePPM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PPM image1(firstImage);
-    PPM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth   = image1.getWidth() + image2.getWidth();
-    unsigned short newLength  = std::max(image1.getLength(), image2.getLength());
-    unsigned char newMaxValue = std::max(image1.getMaxValue(), image2.getMaxValue());
-
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-    newImage << static_cast<unsigned>(newMaxValue) << std::endl;
-
-    //write matrix
-    CollageFunctions::writeCollageHorizontalMatrixPPM(newWidth, newLength, image1, image2,newImage);
-}
-
-void Session::makeHorizontalCollagePGM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PGM image1(firstImage);
-    PGM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth = image1.getWidth() + image2.getWidth();
-    unsigned short newLength = std::max(image1.getLength(), image2.getLength());
-    unsigned char newMaxValue = std::max(image1.getMaxValue(), image2.getMaxValue());
-
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-    newImage << static_cast<unsigned>(newMaxValue) << std::endl;
-
-    //write matrix
-    CollageFunctions::writeCollageHorizontalMatrixPGM(newWidth, newLength, image1, image2, newImage);
+    images[index1]->makeHorizontalCollage(images[index2]);
 
 }
-
-void Session::makeHorizontalCollagePBM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PBM image1(firstImage);
-    PBM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth = image1.getWidth() + image2.getWidth();
-    unsigned short newLength = std::max(image1.getLength(), image2.getLength());
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-
-    //write matrix
-    CollageFunctions::writeCollageHorizontalMatrixPBM(newWidth, newLength, image1, image2, newImage);
-}
-
 
 void Session::makeVerticalCollage(const std::string& firstImage, const std::string& secondImage)
 {
+    int index1 = -1;
+    int index2 = -1;
     try
     {
-        checkIfImagesForCollageInSession(firstImage, secondImage);
+        checkIfImagesForCollageInSession(index1, index2, firstImage, secondImage);
     }
     catch (const std::exception& e)
     {
@@ -487,95 +402,7 @@ void Session::makeVerticalCollage(const std::string& firstImage, const std::stri
         return;
     }
 
-    std::string format = firstImage.substr(firstImage.size() - 4);
-    if (format == ".ppm")
-        makeVerticalCollagePPM(firstImage, secondImage);
-    else if (format == ".pgm")
-        makeVerticalCollagePGM(firstImage, secondImage);
-    else if (format == ".pbm")
-        makeVerticalCollagePBM(firstImage, secondImage);
-}
-
-void Session::makeVerticalCollagePPM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PPM image1(firstImage);
-    PPM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth = std::max(image1.getWidth(), image2.getWidth());
-    unsigned short newLength = image1.getLength() + image2.getLength();
-    unsigned char newMaxValue = std::max(image1.getMaxValue(), image2.getMaxValue());
-
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-    newImage << static_cast<unsigned>(newMaxValue) << std::endl;
-
-    //write matrix
-    CollageFunctions::writeCollageVerticalMatrixPPM(newWidth, newLength, image1, image2, newImage);
-}
-
-void Session::makeVerticalCollagePGM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PGM image1(firstImage);
-    PGM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth = std::max(image1.getWidth(), image2.getWidth());
-    unsigned short newLength = image1.getLength() + image2.getLength();
-    unsigned char newMaxValue = std::max(image1.getMaxValue(), image2.getMaxValue());
-
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-    newImage << static_cast<unsigned>(newMaxValue) << std::endl;
-
-    //write matrix
-    CollageFunctions::writeCollageVerticalMatrixPGM(newWidth, newLength, image1, image2, newImage);
-}
-
-void Session::makeVerticalCollagePBM(const std::string& firstImage, const std::string& secondImage)
-{
-    size_t index1 = 0;
-    size_t index2 = 0;
-    PBM image1(firstImage);
-    PBM image2(secondImage);
-
-    //gets file modified name
-    std::string modifiedFile;
-    getCollageName(modifiedFile, image1, image2);
-
-    //opens file with given name
-    std::ofstream newImage(modifiedFile);
-    if (!newImage)
-        throw std::runtime_error("Bad file!");
-
-    // new file header
-    unsigned short newWidth = std::max(image1.getWidth(), image2.getWidth());
-    unsigned short newLength = image1.getLength() + image2.getLength();
-
-    writeCollageHeader(newWidth, newLength, image1, image2, newImage);
-
-    //write matrix
-    CollageFunctions::writeCollageVerticalMatrixPBM(newWidth, newLength, image1, image2, newImage);
+    images[index1]->makeVerticalCollage(images[index2]);
 }
 
 void Session::exit()
@@ -675,40 +502,8 @@ bool Session::areChanged() const
     return false;
 }
 
-void Session::getCollageName(std::string& modifiedFile, const Image& image1, const Image& image2) const
+void Session::checkIfImagesForCollageInSession(int& index1, int& index2, const std::string& firstImage, const std::string& secondImage) const
 {
-    modifiedFile = image1.getFileName() + '_' + image2.getFileName() + '_';
-    std::string modifiedTime = getModifiedTime();
-    modifiedFile = modifiedFile + modifiedTime + image1.getFileTypeStr();
-}
-
-void Session::writeCollageHeader(unsigned short newWidth, unsigned short newLength, const Image& image1, const Image& image2, std::ofstream& newImage) const
-{
-    ImageProcesing::ImageType da = image1.getFormat();
-    switch (da)
-    {
-    case ImageProcesing::ImageType::P1:
-        newImage << "P1" << std::endl;
-        newImage << newWidth << " " << newLength << std::endl;
-        break;
-    case ImageProcesing::ImageType::P2:
-        newImage << "P2" << std::endl;
-        newImage << newWidth << " " << newLength << std::endl;
-        break;
-    case ImageProcesing::ImageType::P3:
-        newImage << "P3" << std::endl;
-        newImage << newWidth << " " << newLength << std::endl;
-        break;
-    case ImageProcesing::ImageType::defaultType:
-        throw std::runtime_error("Something went wrong!");
-        break;
-    }
-}
-
-void Session::checkIfImagesForCollageInSession(const std::string& firstImage, const std::string& secondImage) const
-{
-    int index1 = -1;
-    int index2 = -1;
     for (size_t i = 0; i < size; i++)
     {
         if (images[i]->getFileName() + images[i]->getFileTypeStr() == firstImage)

@@ -34,6 +34,9 @@ public:
 	virtual void save() override;
 	virtual void save(const std::string& newName);
 
+	virtual void makeHorizontalCollage(const Image* other)	const override;
+	virtual void makeVerticalCollage(const Image* other)	const override;
+
 	//helper protected functions 
 protected:
 	virtual void transposeMatrix() override;
@@ -51,6 +54,9 @@ private:
 private:
 	void writeFileHeader(std::ofstream& newImage)const;
 	void writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned short _length)const;
+
+	void writeCollageHorizontalMatrix(unsigned short newWidth, unsigned short newLength, const PPM* other, std::ofstream& collage)const;
+	void writeCollageVerticalMatrix(unsigned short newWidth, unsigned short newLength, const PPM* other, std::ofstream& collage)const;
 
 	//members
 private:

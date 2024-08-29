@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Image.h"
+#include "Image.h"
 
 class Session
 {
@@ -35,17 +35,7 @@ public:
 	void makeVerticalCollage(const std::string& firstImage, const std::string& secondImage);
 
 private:
-	void makeVerticalCollagePPM(const std::string& firstImage, const std::string& secondImage);
-	void makeVerticalCollagePGM(const std::string& firstImage, const std::string& secondImage);
-	void makeVerticalCollagePBM(const std::string& firstImage, const std::string& secondImage);
-
-	void makeHorizontalCollagePPM(const std::string& firstImage, const std::string& secondImage);
-	void makeHorizontalCollagePGM(const std::string& firstImage, const std::string& secondImage);
-	void makeHorizontalCollagePBM(const std::string& firstImage, const std::string& secondImage);
-
-	void getCollageName(std::string& modifiedFile, const Image& image1, const Image& image2)const;
-	void writeCollageHeader(unsigned short newWidth, unsigned short newLength, const Image& image1, const Image& image2, std::ofstream& newImage)const;
-	void checkIfImagesForCollageInSession(const std::string& firstImage, const std::string& secondImage)const;
+	void checkIfImagesForCollageInSession(int& index1, int& index2, const std::string& firstImage, const std::string& secondImage)const;
 
 	//private helper functions
 private:

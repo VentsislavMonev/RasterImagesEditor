@@ -143,6 +143,60 @@ void PBM::save(const std::string& newName)
 	newImage.close();
 }
 
+void PBM::makeHorizontalCollage(const Image* other) const
+{
+	const PBM* otherPBM = dynamic_cast<const PBM*>(other);
+	if (otherPBM == nullptr)
+	{
+		throw std::invalid_argument("The provided image is not a PBM type.");
+	}
+
+	//gets file modified name
+	std::string modifiedFileName;
+	getCollageName(modifiedFileName, otherPBM);
+
+	//opens file with given name
+	std::ofstream collage(modifiedFileName);
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	//new file header data
+	unsigned short newWidth = getWidth() + otherPBM->getWidth();
+	unsigned short newLength = std::max(getLength(), otherPBM->getLength());
+
+	//writes collage header
+	writeCollageHeader(newWidth, newLength, collage);
+
+	writeCollageHorizontalMatrix(newWidth, newLength, otherPBM, collage);
+}
+
+void PBM::makeVerticalCollage(const Image* other) const
+{
+	const PBM* otherPBM = dynamic_cast<const PBM*>(other);
+	if (otherPBM == nullptr)
+	{
+		throw std::invalid_argument("The provided image is not a PBM type.");
+	}
+
+	//gets file modified name
+	std::string modifiedFileName;
+	getCollageName(modifiedFileName, otherPBM);
+
+	//opens file with given name
+	std::ofstream collage(modifiedFileName);
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	//new file header data
+	unsigned short newWidth = std::max(getWidth(), otherPBM->getWidth());
+	unsigned short newLength = getLength() + otherPBM->getLength();
+
+	//writes collage header
+	writeCollageHeader(newWidth, newLength, collage);
+
+	writeCollageVerticalMatrix(newWidth, newLength, otherPBM, collage);
+}
+
 
 const std::vector<std::vector<bool>>& PBM::getMatrix() const
 {
@@ -174,7 +228,7 @@ void PBM::reverseColumns()
 	bool pixel = 0;
 	for (size_t i = 0; i < rowsCount; i++)
 	{
-		for (size_t j = 0; j < columnsCount; j++)
+		for (size_t j = 0; j < columnsCount/2; j++)
 		{
 			pixel = pixels[i][j];
 			pixels[i][j] = pixels[i][columnsCount - 1 - j];
@@ -186,7 +240,7 @@ void PBM::reverseRows()
 {
 	size_t columnsCount = getWidth();
 	size_t rowsCount = getLength();
-	for (size_t i = 0; i < columnsCount; i++)
+	for (size_t i = 0; i < columnsCount/2; i++)
 		std::swap(pixels[i], pixels[columnsCount - 1 - i]);
 }
 
@@ -254,4 +308,74 @@ bool PBM::setValue(int _value)
 	if (_value == 0 || _value == 1)
 		return _value;
 	else throw std::invalid_argument("Value can be only 0 or 1");
+}
+
+void PBM::writeCollageHorizontalMatrix(unsigned short newWidth, unsigned short newLength, const PBM* other, std::ofstream& collage) const
+{
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short difference1 = (newLength - getLength()) / 2;
+	unsigned short difference2 = (newLength - other->getLength()) / 2;
+
+	int x2 = 0;
+	for (int y = 0; y < newLength; ++y)
+	{
+		for (int x = 0; x < newWidth; ++x)
+		{
+			if (x < getWidth())
+			{
+				// writing pixels from the first image
+				if (y >= difference1 && y < difference1 + getLength())
+						collage << pixels[y - difference1][x] << ' ';
+				else
+					collage << 1 << ' ';
+			}
+			else
+			{
+				// Writing pixels from second image
+				x2 = x - getWidth();
+				if (y >= difference2 && y < difference2 + other->getLength())
+					collage << other->getMatrix()[y - difference2][x2] << ' ';
+				else
+					collage << 1 << ' ';
+			}
+		}
+		collage << std::endl;
+	}
+}
+
+void PBM::writeCollageVerticalMatrix(unsigned short newWidth, unsigned short newLength, const PBM* other, std::ofstream& collage) const
+{
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short difference1 = (newWidth - getWidth()) / 2;
+	unsigned short difference2 = (newWidth - other->getWidth()) / 2;
+
+	int y2 = 0;
+	for (int y = 0; y < newLength; ++y)
+	{
+		for (int x = 0; x < newWidth; ++x)
+		{
+			if (y < getLength())
+			{
+				// Writing pixels from the first image
+				if (x >= difference1 && x < difference1 + getWidth())
+					collage << pixels[y][x - difference1] << ' ';
+				else
+					collage << 1 << ' ';
+			}
+			else
+			{
+				// Writing pixels from the second image
+				y2 = y - getLength();
+				if (x >= difference2 && x < difference2 + other->getWidth())
+					collage << other->getMatrix()[y2][x - difference2] << ' ';
+				else
+					collage << 1 << ' ';
+			}
+		}
+		collage << std::endl;
+	}
 }

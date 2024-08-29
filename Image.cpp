@@ -148,9 +148,7 @@ bool Image::manageCrop(int& topLeftX, int& topLeftY, int& botRightX, int& botRig
 {
 	if (!validateCoordinates(topLeftX, topLeftY, botRightX, botRightY))
 		throw std::invalid_argument("Invalid Coordinates. The image " + fileName + " didn`t changed!");
-	if (!Image::crop(topLeftX, topLeftY, botRightX, botRightY))
-		return false;
-	return true;
+	return Image::crop(topLeftX, topLeftY, botRightX, botRightY);
 }
 void Image::setWidth(int _width)
 {
@@ -311,4 +309,37 @@ void Image::manageFlips(int flipsTop, int flipsLeft)
 {
 	if (flipsTop % 2)  flipTop();
 	if (flipsLeft % 2) flipLeft();
+}
+
+void Image::getCollageName(std::string& modifiedFile, const Image* other) const
+{
+	modifiedFile = fileName + '_' + other->getFileName() + '_';
+	std::string modifiedTime = getModifiedTime();
+	modifiedFile = modifiedFile + modifiedTime + getFileTypeStr();
+}
+
+void Image::writeCollageHeader(unsigned short newWidth, unsigned short newLength, std::ofstream& collage) const
+{
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	ImageProcesing::ImageType collageType = getFormat();
+	switch (collageType)
+	{
+	case ImageProcesing::ImageType::P1:
+		collage << "P1" << std::endl;
+		collage << newWidth << " " << newLength << std::endl;
+		break;
+	case ImageProcesing::ImageType::P2:
+		collage << "P2" << std::endl;
+		collage << newWidth << " " << newLength << std::endl;
+		break;
+	case ImageProcesing::ImageType::P3:
+		collage << "P3" << std::endl;
+		collage << newWidth << " " << newLength << std::endl;
+		break;
+	case ImageProcesing::ImageType::defaultType:
+		throw std::runtime_error("Something went wrong!");
+		break;
+	}
 }

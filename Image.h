@@ -68,6 +68,9 @@ public:
 	virtual void save() = 0;
 	virtual void save(const std::string& newName) = 0;
 
+	virtual void makeHorizontalCollage(const Image* other)	const = 0;
+	virtual void makeVerticalCollage(const Image* other)	const = 0;
+
 //matrix manipulation functions
 protected:
 	virtual void transposeMatrix() = 0;
@@ -87,6 +90,9 @@ protected:
 
 	void manageCommands();
 	void getModifiedFile(std::string& _modifiedFileName)const;
+
+	void getCollageName(std::string& modifiedFile, const Image* other)const;
+	void writeCollageHeader(unsigned short newWidth, unsigned short newLength, std::ofstream& newImage)const;
 
 //setters
 private:

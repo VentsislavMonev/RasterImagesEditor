@@ -302,3 +302,151 @@ void PPM::writeMatrix(std::ofstream& newImage, unsigned short _width, unsigned s
 		newImage << std::endl;
 	}
 }
+
+void PPM::writeCollageHorizontalMatrix(unsigned short newWidth, unsigned short newLength, const PPM* other, std::ofstream& collage)const
+{
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short difference1 = (newLength - getLength()) / 2;
+	unsigned short difference2 = (newLength - other->getLength()) / 2;
+
+	int x2 = 0;
+	for (int y = 0; y < newLength; ++y) 
+	{
+		for (int x = 0; x < newWidth; ++x) 
+		{
+			if (x < getWidth())
+			{
+				// writing pixels from the first image
+				if (y >= difference1 && y < difference1 + getLength())
+				{
+					collage << static_cast<unsigned>(pixels[y - difference1][x].r()) << ' '
+						<< static_cast<unsigned>(pixels[y - difference1][x].g()) << ' '
+						<< static_cast<unsigned>(pixels[y - difference1][x].b()) << ' ';
+				}
+				else
+					collage << 0 << ' ' << 0 << ' ' << 0 << ' ';
+			}
+			else
+			{
+				// Writing pixels from second image
+				x2 = x - getWidth();
+				if (y >= difference2 && y < difference2 + other->getLength())
+				{
+					collage << static_cast<unsigned>(other->getMatrix()[y - difference2][x2].r()) << ' '
+						<< static_cast<unsigned>(other->getMatrix()[y - difference2][x2].g()) << ' '
+						<< static_cast<unsigned>(other->getMatrix()[y - difference2][x2].b()) << ' ';
+				}
+				else
+					collage << 0 << ' ' << 0 << ' ' << 0 << ' ';
+			}
+		}
+		collage << std::endl;
+	}
+}
+
+void PPM::writeCollageVerticalMatrix(unsigned short newWidth, unsigned short newLength, const PPM* other, std::ofstream& collage) const
+{
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	unsigned short difference1 = (newWidth - getWidth()) / 2;
+	unsigned short difference2 = (newWidth - other->getWidth()) / 2;
+
+	int y2 = 0;
+	for (int y = 0; y < newLength; ++y)
+	{
+		for (int x = 0; x < newWidth; ++x)
+		{
+			if (y < getLength())
+			{
+				// Writing pixels from the first image
+				if (x >= difference1 && x < difference1 + getWidth())
+				{
+					collage << static_cast<unsigned>(pixels[y][x - difference1].r()) << ' '
+						<< static_cast<unsigned>(pixels[y][x - difference1].g()) << ' '
+						<< static_cast<unsigned>(pixels[y][x - difference1].b()) << ' ';
+				}
+				else
+				{
+					collage << 0 << ' ' << 0 << ' ' << 0 << ' ';
+				}
+			}
+			else
+			{
+				// Writing pixels from the second image
+				y2 = y - getLength();
+				if (x >= difference2 && x < difference2 + other->getWidth())
+				{
+					collage << static_cast<unsigned>(other->getMatrix()[y2][x - difference2].r()) << ' '
+						<< static_cast<unsigned>(other->getMatrix()[y2][x - difference2].g()) << ' '
+						<< static_cast<unsigned>(other->getMatrix()[y2][x - difference2].b()) << ' ';
+				}
+				else
+				{
+					collage << 0 << ' ' << 0 << ' ' << 0 << ' ';
+				}
+			}
+		}
+		collage << std::endl;
+	}
+}
+
+void PPM::makeHorizontalCollage(const Image* other)const
+{
+	const PPM* otherPPM = dynamic_cast<const PPM*>(other);
+	if (otherPPM == nullptr)
+	{
+		throw std::invalid_argument("The provided image is not a PPM type.");
+	}
+
+	//gets file modified name
+	std::string modifiedFileName;
+	getCollageName(modifiedFileName, otherPPM);
+
+	//opens file with given name
+	std::ofstream collage(modifiedFileName);
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	//new file header data
+	unsigned short newWidth = getWidth() + otherPPM->getWidth();
+	unsigned short newLength = std::max(getLength(), otherPPM->getLength());
+	unsigned char newMaxValue = std::max(getMaxValue(), otherPPM->getMaxValue());
+
+	//writes collage header
+	writeCollageHeader(newWidth, newLength, collage);
+	collage << unsigned(newMaxValue) << std::endl;
+
+	writeCollageHorizontalMatrix(newWidth, newLength, otherPPM, collage);
+}
+
+void PPM::makeVerticalCollage(const Image* other) const
+{
+	const PPM* otherPPM = dynamic_cast<const PPM*>(other);
+	if (otherPPM == nullptr)
+	{
+		throw std::invalid_argument("The provided image is not a PPM type.");
+	}
+
+	//gets file modified name
+	std::string modifiedFile;
+	getCollageName(modifiedFile, otherPPM);
+
+	//opens file with given name
+	std::ofstream collage(modifiedFile);
+	if (!collage)
+		throw std::runtime_error("Bad file!");
+
+	// new file header
+	unsigned short newWidth = std::max(getWidth(), otherPPM->getWidth());
+	unsigned short newLength = getLength() + otherPPM->getLength();
+	unsigned char newMaxValue = std::max(getMaxValue(), otherPPM->getMaxValue());
+
+	writeCollageHeader(newWidth, newLength, collage);
+	collage << static_cast<unsigned>(newMaxValue) << std::endl;
+
+	//write matrix
+	writeCollageVerticalMatrix(newWidth, newLength, otherPPM, collage);
+}
